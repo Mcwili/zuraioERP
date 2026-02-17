@@ -123,17 +123,17 @@ export async function updateOrderFromForm(id: string, formData: FormData) {
   const projectLeadId = formData.get("projectLeadId") as string | null;
 
   const data: Parameters<typeof updateOrder>[1] = {
-    orderNumber: orderNumber?.trim() || null,
-    projectName: projectName?.trim() || null,
+    orderNumber: orderNumber?.trim() || undefined,
+    projectName: projectName?.trim() || undefined,
     status: (status as OrderStatus) || undefined,
     contractType: (contractType as ContractType) || undefined,
-    endDate: endDateStr?.trim() ? new Date(endDateStr) : null,
-    totalValue: totalValueStr?.trim() ? parseFloat(totalValueStr) : null,
-    currency: currency?.trim() || null,
-    paymentTerms: paymentTerms?.trim() || null,
-    internalProjectNumber: internalProjectNumber?.trim() || null,
-    accountOwnerId: accountOwnerId?.trim() || null,
-    projectLeadId: projectLeadId?.trim() || null,
+    endDate: endDateStr?.trim() ? new Date(endDateStr) : undefined,
+    totalValue: totalValueStr?.trim() ? parseFloat(totalValueStr) : undefined,
+    currency: currency?.trim() || undefined,
+    paymentTerms: paymentTerms?.trim() || undefined,
+    internalProjectNumber: internalProjectNumber?.trim() || undefined,
+    accountOwnerId: accountOwnerId?.trim() || undefined,
+    projectLeadId: projectLeadId?.trim() || undefined,
   };
 
   await updateOrder(id, data);

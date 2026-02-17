@@ -1,5 +1,6 @@
 import { getOrganization } from "@/server/actions/organizations";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { Mail, Phone, MapPin, Users } from "lucide-react";
 import { CreateContactForm } from "@/components/contacts/create-contact-form";
 import { EditContactForm } from "@/components/contacts/edit-contact-form";
@@ -40,10 +41,13 @@ export default async function OrganizationDetailPage({
                 style={{ borderColor: "#e1dfdd" }}
               >
                 {c.photoUrl ? (
-                  <img
+                  <Image
                     src={c.photoUrl}
                     alt={`${c.firstName} ${c.lastName}`}
+                    width={64}
+                    height={64}
                     className="w-16 h-16 rounded-full object-cover flex-shrink-0"
+                    unoptimized
                   />
                 ) : (
                   <div

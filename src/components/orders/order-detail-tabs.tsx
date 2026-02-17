@@ -31,6 +31,8 @@ export function OrderDetailTabs({ order, auditLogs }: OrderDetailTabsProps) {
   const t = useTranslations("orders");
   const [activeTab, setActiveTab] = useState<TabId>("overview");
 
+  if (!order) return null;
+
   const currency = order.currency || "CHF";
 
   const contractValue = order.totalValue ? Number(order.totalValue) : 0;
