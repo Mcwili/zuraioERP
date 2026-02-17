@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-size: 16px;
+  /* Basis – wie alt */
+  --background: #fafafa;
+  --foreground: #1c1c1c;
+  --card: #ffffff;
+  --card-foreground: #1c1c1c;
+  --border: #e1dfdd;
+  --primary: #5ebc67;
+  --primary-foreground: #ffffff;
+  --muted: #f8f8f8;
+  --muted-foreground: #605e5c;
+  --accent: #edebe9;
+  --accent-foreground: #323130;
+  --destructive: #d13438;
+  --destructive-foreground: #ffffff;
+  --ring: #DCE6B5;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --radius: 0.5rem;
+
+  /* Header – wie alt */
+  --header-background: #ffffff;
+  --header-border: #e5e7eb;
+  --header-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --header-text: #1f2937;
+  --header-text-muted: #6b7280;
+
+  /* Graustufen – wie alt */
+  --gray-light: #F5F6F7;
+  --gray-medium: #E1E3E6;
+  --gray-dark: #4A4D50;
+
+  /* Utilities */
+  --color-header-background: var(--header-background);
+  --color-header-border: var(--header-border);
+  --shadow-header: var(--header-shadow);
+  --color-header-text: var(--header-text);
+  --color-header-text-muted: var(--header-text-muted);
+  --color-gray-light: var(--gray-light);
+  --color-gray-medium: var(--gray-medium);
+  --color-gray-dark: var(--gray-dark);
+  --foreground-muted: var(--muted-foreground);
+
+  /* Zuraio ERP spezifisch */
+  --zuraio-white: #ffffff;
+  --zuraio-sidebar: #f8f8f8;
+  --zuraio-accent: #9aca3c;
+  --zuraio-text: #333333;
+  --zuraio-text-muted: #777777;
+}
+
+/* Typografie – wie alt */
+:root {
+  --text-2xl: 1.5rem;
+  --text-xl: 1.25rem;
+  --text-lg: 1.125rem;
+  --text-base: 1rem;
+}
+
+html {
+  font-size: var(--font-size);
+}
+
+body {
+  font-family: "Inter", "Roboto", "Segoe UI", sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* Typography base */
+h1 {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.5;
+}
+
+h2 {
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.5;
+}
+
+h3 {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.5;
+}
+
+h4 {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.5;
+}
+
+p {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.5;
+}
+
+label {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.5;
+}
+
+button {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.5;
+}
+
+input {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.5;
+}
+
+/* Number Input – Spinner entfernen */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Scrollbar – wie alt */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #e1dfdd;
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #c9c7c5;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #e1dfdd transparent;
+}
+
+/* Textauswahl – wie alt */
+::selection {
+  background-color: #DCE6B5;
+  color: #000000;
+}
+
+::-moz-selection {
+  background-color: #DCE6B5;
+  color: #000000;
+}

@@ -1,0 +1,532 @@
+// Zuraio ERP - Prisma Schema
+// MVP: User, Role, AuditLog, LoginLog
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+enum Role {
+  ADMIN
+  SALES
+  PROJECT_LEAD
+  FINANCE
+  DELIVERY
+  MANAGEMENT
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String    @map("password_hash")
+  name          String?
+  role          Role      @default(SALES)
+  isActive      Boolean   @default(true) @map("is_active")
+  emailVerified DateTime? @map("email_verified")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  loginLogs       LoginLog[]
+  auditLogs       AuditLog[]
+  documents       Document[]
+  accountOwnerOrders Order[]
+
+  @@map("users")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?  @map("user_id")
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String?  @map("entity_id")
+  oldValues  Json?    @map("old_values")
+  newValues  Json?    @map("new_values")
+  ipAddress  String?  @map("ip_address")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model LoginLog {
+  id        String   @id @default(cuid())
+  userId    String?  @map("user_id")
+  email     String
+  success   Boolean
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([email])
+  @@index([createdAt])
+  @@map("login_logs")
+}
+
+// --- Kontakte und Organisationen ---
+
+enum OrganizationType {
+  CUSTOMER
+  PARTNER
+  SUPPLIER
+}
+
+enum ContactRole {
+  BILLING
+  PROJECT_LEAD
+  PURCHASING
+  TECHNICAL
+  OTHER
+}
+
+enum AddressType {
+  INVOICE
+  DELIVERY
+  HEADQUARTERS
+}
+
+enum DocumentType {
+  CONTRACT
+  NDA
+  OFFER
+  ORDER
+  CORRESPONDENCE
+}
+
+model Organization {
+  id                   String           @id @default(cuid())
+  name                 String
+  type                 OrganizationType  @default(CUSTOMER)
+  parentOrganizationId String?           @map("parent_organization_id")
+  paymentTerms         Json?             @map("payment_terms")
+  creditLimit          Decimal?         @map("credit_limit") @db.Decimal(12, 2)
+  tags                 String[]         @default([])
+  keyAccount           Boolean          @default(false) @map("key_account")
+  createdAt            DateTime         @default(now()) @map("created_at")
+  updatedAt            DateTime         @updatedAt @map("updated_at")
+
+  parentOrganization   Organization?    @relation("OrganizationHierarchy", fields: [parentOrganizationId], references: [id])
+  childOrganizations   Organization[]   @relation("OrganizationHierarchy")
+  contacts             Contact[]
+  addresses            Address[]
+  documents            Document[]
+  orders               Order[]
+
+  @@index([type])
+  @@index([parentOrganizationId])
+  @@map("organizations")
+}
+
+model Contact {
+  id             String       @id @default(cuid())
+  organizationId String       @map("organization_id")
+  firstName      String       @map("first_name")
+  lastName       String       @map("last_name")
+  email          String?
+  phone          String?
+  photoUrl       String?      @map("photo_url")
+  role           ContactRole  @default(OTHER)
+  isPrimary      Boolean      @default(false) @map("is_primary")
+  preferredLocale String?     @map("preferred_locale")
+  notes          String?      @db.Text
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  projectLeadOrders Order[]
+
+  @@index([organizationId])
+  @@index([email])
+  @@map("contacts")
+}
+
+model Address {
+  id             String      @id @default(cuid())
+  organizationId String      @map("organization_id")
+  type           AddressType @default(INVOICE)
+  street         String?
+  postalCode     String?     @map("postal_code")
+  city           String?
+  country        String?     @default("CH")
+  createdAt      DateTime    @default(now()) @map("created_at")
+  updatedAt      DateTime    @updatedAt @map("updated_at")
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("addresses")
+}
+
+model Document {
+  id                  String       @id @default(cuid())
+  organizationId      String       @map("organization_id")
+  orderId             String?      @map("order_id")
+  type                DocumentType
+  fileName            String       @map("file_name")
+  sharePointDriveId   String?      @map("share_point_drive_id")
+  sharePointItemId    String?      @map("share_point_item_id")
+  sharePointWebUrl    String?      @map("share_point_web_url")
+  mimeType            String?      @map("mime_type")
+  size                Int?         @default(0)
+  uploadedAt          DateTime     @default(now()) @map("uploaded_at")
+  uploadedById        String?      @map("uploaded_by_id")
+
+  organization        Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  order               Order?      @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  uploadedBy          User?        @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([orderId])
+  @@map("documents")
+}
+
+// --- Produkte und Preislisten ---
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String?  @db.Text
+  type        String   @default("LICENSE") // LICENSE | SERVICE
+  unit        String   @default("PCS")
+  vatRate     Decimal  @default(0) @map("vat_rate") @db.Decimal(5, 2)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  prices      ProductPrice[]
+  priceLists  PriceListProduct[]
+
+  @@map("products")
+}
+
+model PriceList {
+  id        String   @id @default(cuid())
+  name      String
+  validFrom DateTime? @map("valid_from")
+  validTo   DateTime? @map("valid_to")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  products PriceListProduct[]
+
+  @@map("price_lists")
+}
+
+model PriceListProduct {
+  id          String   @id @default(cuid())
+  priceListId String   @map("price_list_id")
+  productId   String   @map("product_id")
+  price       Decimal  @db.Decimal(12, 2)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  priceList PriceList @relation(fields: [priceListId], references: [id], onDelete: Cascade)
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([priceListId, productId])
+  @@index([priceListId])
+  @@index([productId])
+  @@map("price_list_products")
+}
+
+model ProductPrice {
+  id        String   @id @default(cuid())
+  productId String   @map("product_id")
+  price     Decimal  @db.Decimal(12, 2)
+  validFrom DateTime @default(now()) @map("valid_from")
+  validTo   DateTime? @map("valid_to")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("product_prices")
+}
+
+// --- Aufträge ---
+
+enum OrderStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+}
+
+enum ContractType {
+  PROJECT
+  LICENSE
+  MIXED
+}
+
+model Order {
+  id                   String        @id @default(cuid())
+  organizationId       String        @map("organization_id")
+  contactId            String?       @map("contact_id")
+  orderNumber          String?       @unique @map("order_number")
+  projectName          String?       @map("project_name")
+  status               OrderStatus   @default(DRAFT)
+  contractType         ContractType  @default(PROJECT) @map("contract_type")
+  startDate            DateTime      @map("start_date")
+  endDate              DateTime?     @map("end_date")
+  totalValue           Decimal?      @map("total_value") @db.Decimal(12, 2)
+  currency             String?       @default("CHF")
+  paymentTerms         String?       @map("payment_terms")
+  internalProjectNumber String?      @map("internal_project_number")
+  accountOwnerId      String?       @map("account_owner_id")
+  projectLeadId       String?       @map("project_lead_id")
+  billingModel        String        @default("PERIODIC") @map("billing_model")
+  createdAt            DateTime      @default(now()) @map("created_at")
+  updatedAt            DateTime      @updatedAt @map("updated_at")
+
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  accountOwner   User?          @relation(fields: [accountOwnerId], references: [id], onDelete: SetNull)
+  projectLead    Contact?       @relation(fields: [projectLeadId], references: [id], onDelete: SetNull)
+  items          OrderItem[]
+  milestones     Milestone[]
+  versions       OrderVersion[]
+  billingPlan    BillingPlan?
+  budgetPlans    BudgetPlan[]
+  actualCosts    BudgetActualCost[]
+  tasks          OrderTask[]
+  invoices       Invoice[]
+  documents      Document[]
+
+  @@index([organizationId])
+  @@index([status])
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String   @id @default(cuid())
+  orderId     String   @map("order_id")
+  productId  String?  @map("product_id")
+  description String   @db.Text
+  quantity    Decimal  @default(1) @db.Decimal(12, 2)
+  unitPrice   Decimal  @map("unit_price") @db.Decimal(12, 2)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+model Milestone {
+  id          String    @id @default(cuid())
+  orderId     String    @map("order_id")
+  name        String
+  percentage  Int       @default(0)
+  dueDate     DateTime? @map("due_date")
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("milestones")
+}
+
+model OrderVersion {
+  id        String   @id @default(cuid())
+  orderId   String   @map("order_id")
+  version   Int
+  changes   Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("order_versions")
+}
+
+enum OrderTaskType {
+  MILESTONE
+  RENEWAL
+  TODO
+}
+
+model OrderTask {
+  id          String        @id @default(cuid())
+  orderId     String        @map("order_id")
+  type        OrderTaskType @default(TODO)
+  title       String
+  dueDate     DateTime?     @map("due_date")
+  completedAt DateTime?     @map("completed_at")
+  notes       String?       @db.Text
+  createdAt   DateTime      @default(now()) @map("created_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("order_tasks")
+}
+
+model BudgetPlan {
+  id        String   @id @default(cuid())
+  orderId   String   @map("order_id")
+  version   Int      @default(1)
+  comment   String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  order  Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  months BudgetPlanMonth[]
+
+  @@index([orderId])
+  @@map("budget_plans")
+}
+
+model BudgetPlanMonth {
+  id                    String    @id @default(cuid())
+  budgetPlanId          String    @map("budget_plan_id")
+  yearMonth             String    @map("year_month")
+  plannedPersonnel      Decimal   @default(0) @map("planned_personnel") @db.Decimal(12, 2)
+  plannedExternal       Decimal   @default(0) @map("planned_external") @db.Decimal(12, 2)
+  plannedInfrastructure Decimal  @default(0) @map("planned_infrastructure") @db.Decimal(12, 2)
+  plannedRevenue        Decimal?  @map("planned_revenue") @db.Decimal(12, 2)
+  createdAt             DateTime  @default(now()) @map("created_at")
+
+  budgetPlan BudgetPlan @relation(fields: [budgetPlanId], references: [id], onDelete: Cascade)
+
+  @@index([budgetPlanId])
+  @@index([yearMonth])
+  @@map("budget_plan_months")
+}
+
+model BudgetActualCost {
+  id             String   @id @default(cuid())
+  orderId        String   @map("order_id")
+  date           DateTime
+  costType       String   @map("cost_type")
+  amount         Decimal  @db.Decimal(12, 2)
+  supplier       String?
+  assignedMonth  String   @map("assigned_month")
+  paid           Boolean  @default(false)
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([assignedMonth])
+  @@map("budget_actual_costs")
+}
+
+// --- Abrechnung ---
+
+model BillingPlan {
+  id              String   @id @default(cuid())
+  orderId         String   @unique @map("order_id")
+  interval        String   @default("MONTHLY")
+  nextBillingDate DateTime? @map("next_billing_date")
+  proRata         Boolean  @default(true) @map("pro_rata")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  order  Order            @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  items  BillingPlanItem[]
+
+  @@map("billing_plans")
+}
+
+enum BillingPlanItemStatus {
+  PLANNED
+  INVOICED
+  PAID
+}
+
+model BillingPlanItem {
+  id            String               @id @default(cuid())
+  billingPlanId String               @map("billing_plan_id")
+  amount        Decimal              @db.Decimal(12, 2)
+  dueDate       DateTime             @map("due_date")
+  description   String?              @db.Text
+  status        BillingPlanItemStatus @default(PLANNED)
+  invoiced      Boolean              @default(false)
+  invoiceId     String?              @map("invoice_id")
+  paidAt        DateTime?            @map("paid_at")
+  createdAt     DateTime             @default(now()) @map("created_at")
+
+  billingPlan BillingPlan @relation(fields: [billingPlanId], references: [id], onDelete: Cascade)
+  invoice    Invoice?    @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+
+  @@index([billingPlanId])
+  @@index([dueDate])
+  @@map("billing_plan_items")
+}
+
+model Invoice {
+  id        String    @id @default(cuid())
+  number    String    @unique
+  status    String    @default("DRAFT")
+  dueDate   DateTime  @map("due_date")
+  orderId   String?   @map("order_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  order     Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  items     InvoiceItem[]
+  planItems BillingPlanItem[]
+  payments  Payment[]
+
+  @@index([status])
+  @@index([dueDate])
+  @@index([orderId])
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id          String   @id @default(cuid())
+  invoiceId   String   @map("invoice_id")
+  description String   @db.Text
+  quantity    Decimal  @default(1) @db.Decimal(12, 2)
+  unitPrice   Decimal  @map("unit_price") @db.Decimal(12, 2)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@map("invoice_items")
+}
+
+// --- Mahnwesen ---
+
+model Payment {
+  id        String    @id @default(cuid())
+  invoiceId String    @map("invoice_id")
+  amount    Decimal   @db.Decimal(12, 2)
+  paidAt    DateTime  @map("paid_at")
+  reference String?
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@map("payments")
+}
+
+model DunningLevel {
+  id          String   @id @default(cuid())
+  level       Int
+  daysOverdue Int      @map("days_overdue")
+  fee         Decimal  @default(0) @db.Decimal(12, 2)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("dunning_levels")
+}
+
+model DunningRun {
+  id        String   @id @default(cuid())
+  runAt     DateTime @map("run_at")
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("dunning_runs")
+}
