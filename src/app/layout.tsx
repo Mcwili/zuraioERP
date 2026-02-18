@@ -19,7 +19,7 @@ export default async function RootLayout({
   return (
     <html lang="de">
       <body className="antialiased">
-        <NextIntlClientProvider messages={messages}>
+        <NextIntlClientProvider messages={messages ?? {}}>
           <Providers>{children}</Providers>
         </NextIntlClientProvider>
       </body>

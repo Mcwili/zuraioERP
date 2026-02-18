@@ -19,6 +19,7 @@ export default getRequestConfig(async () => {
     auth: common.auth,
     nav: common.nav,
     actions: common.actions,
+    settings: common.settings ?? {},
     contacts: (await import(`../../locales/${locale}/contacts.json`)).default,
     orders: (await import(`../../locales/${locale}/orders.json`)).default,
     billing: (await import(`../../locales/${locale}/billing.json`)).default,

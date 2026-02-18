@@ -30,3 +30,7 @@ export function canAccessProducts(role: Role): boolean {
 export function canAccessAlerts(role: Role): boolean {
   return true; // Alle Rollen
 }
+
+export function canManageUsers(role: Role): boolean {
+  return role === "ADMIN";
+}
