@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { useTranslations } from "next-intl";
 import type { Organization } from "@prisma/client";
 
 export function OrderForm({
@@ -10,6 +11,7 @@ export function OrderForm({
   action: (formData: FormData) => Promise<void>;
   organizations: Organization[];
 }) {
+  const t = useTranslations("orders");
   const [isPending, startTransition] = useTransition();
 
   return (
@@ -35,25 +37,16 @@ export function OrderForm({
           ))}
         </select>
       </div>
-      <div>
-        <label className="block text-sm font-medium text-zuraio-text mb-1">
-          Startdatum
-        </label>
-        <input
-          name="startDate"
-          type="date"
-          required
-          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#DCE6B5]"
-          style={{ borderColor: "#e1dfdd" }}
-        />
-      </div>
+      <p className="text-xs text-zuraio-textMuted">
+        {t("orderNumberOnAssignHint")}
+      </p>
       <button
         type="submit"
         disabled={isPending}
         className="px-4 py-2 rounded-md disabled:opacity-50 text-black font-medium hover:opacity-90"
         style={{ backgroundColor: "#9FAF52" }}
       >
-        {isPending ? "Speichern..." : "Speichern"}
+        {isPending ? "..." : t("createOrder")}
       </button>
     </form>
   );

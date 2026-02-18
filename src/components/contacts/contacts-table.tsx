@@ -2,16 +2,45 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ChevronRight, ChevronUp, ChevronDown, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ChevronRight, ChevronUp, ChevronDown, Search, Building2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 type SortKey = "name" | "type" | "contacts";
+
+interface Address {
+  id: string;
+  type: string;
+  street: string | null;
+  postalCode: string | null;
+  city: string | null;
+  country: string | null;
+}
 
 interface Organization {
   id: string;
   name: string;
   type: string;
+  logoUrl: string | null;
+  addresses: Address[];
   _count: { contacts: number };
+}
+
+function getMainAddress(addresses: Address[]): string {
+  const order = ["HEADQUARTERS", "INVOICE", "DELIVERY"];
+  for (const type of order) {
+    const addr = addresses.find((a) => a.type === type);
+    if (addr) {
+      const parts = [addr.street, [addr.postalCode, addr.city].filter(Boolean).join(" "), addr.country].filter(Boolean);
+      return parts.join(", ") || "–";
+    }
+  }
+  const first = addresses[0];
+  if (first) {
+    const parts = [first.street, [first.postalCode, first.city].filter(Boolean).join(" "), first.country].filter(Boolean);
+    return parts.join(", ") || "–";
+  }
+  return "–";
 }
 
 interface ContactsTableProps {
@@ -20,6 +49,7 @@ interface ContactsTableProps {
 
 export function ContactsTable({ organizations }: ContactsTableProps) {
   const t = useTranslations("contacts");
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<SortKey>("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
@@ -80,12 +110,13 @@ export function ContactsTable({ organizations }: ContactsTableProps) {
         />
       </div>
       <div
-        className="bg-white overflow-hidden border"
+        className="bg-white overflow-x-auto overflow-y-hidden border"
         style={{ borderColor: "#e1dfdd" }}
       >
       <table className="w-full text-sm">
         <thead style={{ borderBottom: "1px solid #e1dfdd", backgroundColor: "#f8f8f7" }}>
           <tr>
+            <th className="text-left px-3 py-2 w-12" />
             <th className="text-left px-3 py-2">
               <button
                 type="button"
@@ -106,6 +137,11 @@ export function ContactsTable({ organizations }: ContactsTableProps) {
                 <SortIcon column="type" />
               </button>
             </th>
+            <th className="text-left px-3 py-2 w-40">
+              <span className="text-xs font-medium text-zuraio-textMuted uppercase tracking-wider">
+                {t("columnAddress")}
+              </span>
+            </th>
             <th className="px-3 py-2 w-20">
               <button
                 type="button"
@@ -123,19 +159,40 @@ export function ContactsTable({ organizations }: ContactsTableProps) {
           {sorted.map((org) => (
             <tr
               key={org.id}
-              className="border-t transition-colors hover:bg-[#DCE6B5]"
+              onClick={() => router.push(`/dashboard/contacts/${org.id}`)}
+              className="border-t transition-colors hover:bg-[#DCE6B5] cursor-pointer"
               style={{ borderColor: "#e1dfdd" }}
             >
-              <td className="px-3 py-2">
-                <Link
-                  href={`/dashboard/contacts/${org.id}`}
-                  className="font-medium text-zuraio-text hover:underline"
-                >
-                  {org.name}
-                </Link>
+              <td className="px-3 py-2 w-12">
+                {org.logoUrl ? (
+                  <div className="w-10 h-10 rounded flex items-center justify-center overflow-hidden flex-shrink-0 bg-[#f8f8f7]">
+                    <img
+                      src={org.logoUrl}
+                      alt={org.name}
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div
+                    className="w-10 h-10 rounded flex items-center justify-center flex-shrink-0 text-sm font-semibold"
+                    style={{ backgroundColor: "#DCE6B5", color: "#1c1c1c" }}
+                  >
+                    <Building2 className="h-5 w-5" />
+                  </div>
+                )}
               </td>
-              <td className="px-3 py-2 text-zuraio-textMuted text-xs">
-                {org.type}
+              <td className="px-3 py-2 max-w-0">
+                <span className="font-medium text-zuraio-text block truncate">
+                  {org.name}
+                </span>
+              </td>
+              <td className="px-3 py-2 text-zuraio-textMuted text-xs max-w-0">
+                <span className="block truncate">{org.type}</span>
+              </td>
+              <td className="px-3 py-2 text-zuraio-textMuted text-xs max-w-0">
+                <span className="block truncate" title={getMainAddress(org.addresses)}>
+                  {getMainAddress(org.addresses)}
+                </span>
               </td>
               <td className="px-3 py-2 text-zuraio-textMuted text-xs text-right tabular-nums">
                 {org._count.contacts}
@@ -143,6 +200,7 @@ export function ContactsTable({ organizations }: ContactsTableProps) {
               <td className="px-2 py-2">
                 <Link
                   href={`/dashboard/contacts/${org.id}`}
+                  onClick={(e) => e.stopPropagation()}
                   className="inline-flex items-center justify-center w-7 h-7 rounded transition-colors hover:bg-[#DCE6B5]"
                   style={{ color: "#9FAF52" }}
                   title={t("open")}

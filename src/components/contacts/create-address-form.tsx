@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { createAddress } from "@/server/actions/addresses";
 import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 
 export function CreateAddressForm({ organizationId }: { organizationId: string }) {
+  const t = useTranslations("contacts");
+  const tActions = useTranslations("actions");
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -30,7 +33,7 @@ export function CreateAddressForm({ organizationId }: { organizationId: string }
         style={{ color: "#9FAF52" }}
       >
         <Plus className="h-4 w-4" />
-        Adresse hinzufügen
+        {t("addAddress")}
       </button>
 
       {open && (
@@ -46,28 +49,28 @@ export function CreateAddressForm({ organizationId }: { organizationId: string }
           >
             <div className="p-6 border-b" style={{ borderColor: "#e1dfdd" }}>
               <h3 className="text-lg font-semibold" style={{ color: "#1c1c1c" }}>
-                Adresse hinzufügen
+                {t("addAddress")}
               </h3>
             </div>
             <form action={handleSubmit} className="p-6 space-y-4">
               <input type="hidden" name="organizationId" value={organizationId} />
               <div>
                 <label className="block text-sm font-medium text-zuraio-textMuted mb-1.5">
-                  Typ
+                  {t("labelType")}
                 </label>
                 <select
                   name="type"
                   className="w-full px-3 py-2 text-base border rounded-md focus:outline-none focus:ring-2 focus:ring-[#DCE6B5]"
                   style={{ borderColor: "#e1dfdd" }}
                 >
-                  <option value="INVOICE">Rechnungsadresse</option>
-                  <option value="DELIVERY">Lieferadresse</option>
-                  <option value="HEADQUARTERS">Standort</option>
+                  <option value="INVOICE">{t("addressInvoice")}</option>
+                  <option value="DELIVERY">{t("addressDelivery")}</option>
+                  <option value="HEADQUARTERS">{t("addressHeadquarters")}</option>
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-zuraio-textMuted mb-1.5">
-                  Strasse
+                  {t("labelStreet")}
                 </label>
                 <input
                   name="street"
@@ -78,7 +81,7 @@ export function CreateAddressForm({ organizationId }: { organizationId: string }
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-zuraio-textMuted mb-1.5">
-                    PLZ
+                    {t("labelPostalCode")}
                   </label>
                   <input
                     name="postalCode"
@@ -88,7 +91,7 @@ export function CreateAddressForm({ organizationId }: { organizationId: string }
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-zuraio-textMuted mb-1.5">
-                    Ort
+                    {t("labelCity")}
                   </label>
                   <input
                     name="city"
@@ -99,7 +102,7 @@ export function CreateAddressForm({ organizationId }: { organizationId: string }
               </div>
               <div>
                 <label className="block text-sm font-medium text-zuraio-textMuted mb-1.5">
-                  Land
+                  {t("labelCountry")}
                 </label>
                 <input
                   name="country"
@@ -114,7 +117,7 @@ export function CreateAddressForm({ organizationId }: { organizationId: string }
                   className="px-4 py-2 rounded-md text-black font-medium"
                   style={{ backgroundColor: "#9FAF52" }}
                 >
-                  Speichern
+                  {tActions("save")}
                 </button>
                 <button
                   type="button"
@@ -122,7 +125,7 @@ export function CreateAddressForm({ organizationId }: { organizationId: string }
                   className="px-4 py-2 border rounded-md"
                   style={{ borderColor: "#e1dfdd" }}
                 >
-                  Abbrechen
+                  {tActions("cancel")}
                 </button>
               </div>
             </form>

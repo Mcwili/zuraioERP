@@ -2,29 +2,33 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { uploadOrganizationDocument } from "@/server/actions/documents";
+import { updateOrganization } from "@/server/actions/organizations";
 import { useRouter } from "next/navigation";
-import { Upload } from "lucide-react";
+import { Pencil } from "lucide-react";
+import type { Organization } from "@prisma/client";
 
-export function DocumentUpload({ organizationId }: { organizationId: string }) {
+export function EditOrganizationForm({ organization }: { organization: Organization }) {
   const t = useTranslations("contacts");
   const tActions = useTranslations("actions");
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [pending, setPending] = useState(false);
   const router = useRouter();
 
   async function handleSubmit(formData: FormData) {
     setError("");
-    setLoading(true);
+    setPending(true);
     try {
-      await uploadOrganizationDocument(formData);
+      await updateOrganization(organization.id, {
+        name: formData.get("name") as string,
+        type: formData.get("type") as "CUSTOMER" | "PARTNER" | "SUPPLIER",
+      });
       setOpen(false);
       router.refresh();
     } catch (e) {
-      setError(e instanceof Error ? e.message : t("uploadFailed"));
+      setError(e instanceof Error ? e.message : t("saveError"));
     } finally {
-      setLoading(false);
+      setPending(false);
     }
   }
 
@@ -32,11 +36,10 @@ export function DocumentUpload({ organizationId }: { organizationId: string }) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1 text-sm hover:underline font-medium"
-        style={{ color: "#9FAF52" }}
+        className="p-2 rounded-md transition-colors hover:bg-[#DCE6B5]"
+        title={t("editOrganization")}
       >
-        <Upload className="h-4 w-4" />
-        {t("uploadDocument")}
+        <Pencil className="h-4 w-4" style={{ color: "#9FAF52" }} />
       </button>
 
       {open && (
@@ -46,70 +49,68 @@ export function DocumentUpload({ organizationId }: { organizationId: string }) {
           onClick={() => setOpen(false)}
         >
           <div
-            className="w-full max-w-md rounded-lg shadow-xl overflow-hidden"
-            style={{ backgroundColor: "#ffffff" }}
+            className="w-full max-w-md rounded-lg shadow-xl overflow-hidden min-w-0 bg-white"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6 border-b" style={{ borderColor: "#e1dfdd" }}>
               <h3 className="text-lg font-semibold" style={{ color: "#1c1c1c" }}>
-                {t("uploadDocument")}
+                {t("editOrganization")}
               </h3>
             </div>
             <form
-              onSubmit={async (e) => {
+              onSubmit={(e) => {
                 e.preventDefault();
-                await handleSubmit(new FormData(e.currentTarget));
+                handleSubmit(new FormData(e.currentTarget));
               }}
               className="p-6 space-y-4"
             >
-              <input type="hidden" name="organizationId" value={organizationId} />
               <div>
                 <label className="block text-sm font-medium text-zuraio-textMuted mb-1.5">
-                  {t("documentType")}
+                  {t("labelName")}
+                </label>
+                <input
+                  name="name"
+                  required
+                  defaultValue={organization.name}
+                  className="w-full px-3 py-2 text-base border rounded-md focus:outline-none focus:ring-2 focus:ring-[#DCE6B5]"
+                  style={{ borderColor: "#e1dfdd" }}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-zuraio-textMuted mb-1.5">
+                  {t("labelType")}
                 </label>
                 <select
                   name="type"
-                  required
+                  defaultValue={organization.type}
                   className="w-full px-3 py-2 text-base border rounded-md focus:outline-none focus:ring-2 focus:ring-[#DCE6B5]"
                   style={{ borderColor: "#e1dfdd" }}
                 >
-                  <option value="CONTRACT">{t("docTypeContract")}</option>
-                  <option value="NDA">{t("docTypeNda")}</option>
-                  <option value="CORRESPONDENCE">{t("docTypeCorrespondence")}</option>
+                  <option value="CUSTOMER">{t("typeCustomer")}</option>
+                  <option value="PARTNER">{t("typePartner")}</option>
+                  <option value="SUPPLIER">{t("typeSupplier")}</option>
                 </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-zuraio-textMuted mb-1.5">
-                  {t("fileHint")}
-                </label>
-                <input
-                  name="file"
-                  type="file"
-                  required
-                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                  className="w-full text-base py-2"
-                />
               </div>
               {error && (
                 <div
-                  className="p-3 rounded-lg border flex items-center gap-2"
+                  className="p-3 rounded-lg text-sm"
                   style={{
-                    background: "rgba(209, 52, 56, 0.05)",
-                    borderColor: "rgba(209, 52, 56, 0.2)",
+                    backgroundColor: "rgba(209, 52, 56, 0.05)",
+                    border: "1px solid rgba(209, 52, 56, 0.2)",
                     color: "#d13438",
                   }}
                 >
-                  <span className="text-sm">{error}</span>
+                  {error}
                 </div>
               )}
               <div className="flex gap-3 pt-2">
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="px-4 py-2 rounded-md disabled:opacity-50 text-black font-medium"
+                  disabled={pending}
+                  className="px-4 py-2 rounded-md text-black font-medium disabled:opacity-50"
                   style={{ backgroundColor: "#9FAF52" }}
                 >
-                  {loading ? `${t("upload")}…` : t("upload")}
+                  {pending ? `${tActions("save")}…` : tActions("save")}
                 </button>
                 <button
                   type="button"

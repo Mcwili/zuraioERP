@@ -39,7 +39,7 @@ export default async function BillingPage() {
         <h2 className="font-semibold text-zuraio-text mb-4">
           Rechnungen
         </h2>
-        <div className="bg-white rounded-lg overflow-hidden border" style={{ borderColor: "#e1dfdd" }}>
+        <div className="bg-white rounded-lg overflow-x-auto overflow-y-hidden border" style={{ borderColor: "#e1dfdd" }}>
           <table className="w-full">
             <thead className="bg-zuraio-sidebar" style={{ borderBottom: "1px solid #e1dfdd" }}>
               <tr>

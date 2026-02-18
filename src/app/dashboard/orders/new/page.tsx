@@ -7,6 +7,7 @@ import { OrderForm } from "@/components/orders/order-form";
 import { PageBanner } from "@/components/dashboard/page-banner";
 import { FileText } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { generateOrderNumber } from "@/lib/order-number";
 
 export default async function NewOrderPage() {
   const t = await getTranslations("orders");
@@ -23,17 +24,19 @@ export default async function NewOrderPage() {
   async function createOrder(formData: FormData) {
     "use server";
     const orgId = formData.get("organizationId") as string;
-    const startDate = new Date(formData.get("startDate") as string);
-    await prisma.order.create({
+    if (!orgId?.trim()) throw new Error("Kunde erforderlich");
+    const orderNumber = await generateOrderNumber(orgId);
+    const order = await prisma.order.create({
       data: {
         organizationId: orgId,
-        startDate,
+        orderNumber,
+        startDate: new Date(),
         billingModel: "PERIODIC",
         status: "DRAFT",
         contractType: "PROJECT",
       },
     });
-    redirect("/dashboard/orders");
+    redirect(`/dashboard/orders/${order.id}`);
   }
 
   return (

@@ -1,0 +1,5 @@
+-- AlterEnum
+ALTER TYPE "ContactRole" ADD VALUE IF NOT EXISTS 'MANAGEMENT';
+
+-- AlterEnum
+ALTER TYPE "ContactRole" ADD VALUE IF NOT EXISTS 'IT_LEAD';

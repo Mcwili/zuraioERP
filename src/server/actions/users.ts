@@ -7,6 +7,7 @@ import { hash } from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { Role } from "@prisma/client";
 import { logAudit } from "@/lib/audit";
+import { canAccessOrders } from "@/lib/permissions";
 const PHOTO_MIME = ["image/jpeg", "image/png", "image/webp"];
 const PHOTO_MAX_SIZE = 500 * 1024; // 500 KB (Base64 in DB – klein halten)
 
@@ -37,6 +38,18 @@ export async function getCurrentUserProfile() {
       imageUrl: null,
     };
   }
+}
+
+/** Benutzer für Account-Owner-Auswahl (gleiche Quelle wie Benutzerverwaltung) */
+export async function getUsersForAccountOwner() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) throw new Error("Nicht angemeldet");
+  if (!canAccessOrders(session.user.role)) throw new Error("Keine Berechtigung");
+
+  return prisma.user.findMany({
+    orderBy: { email: "asc" },
+    select: { id: true, name: true, email: true },
+  });
 }
 
 export async function getUsers() {

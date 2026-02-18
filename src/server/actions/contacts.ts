@@ -17,7 +17,7 @@ const contactSchema = z.object({
   email: z.string().email().optional().or(z.literal("")),
   phone: z.string().optional(),
   photoUrl: z.string().optional().nullable(),
-  role: z.enum(["BILLING", "PROJECT_LEAD", "PURCHASING", "TECHNICAL", "OTHER"]),
+  role: z.enum(["BILLING", "PROJECT_LEAD", "PURCHASING", "TECHNICAL", "MANAGEMENT", "IT_LEAD", "OTHER"]),
   isPrimary: z.boolean().optional(),
   preferredLocale: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),

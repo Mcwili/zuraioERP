@@ -2,32 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  Users,
-  FileText,
-  Receipt,
-  Wallet,
-  TrendingUp,
-  BarChart3,
-  Bell,
-  Settings,
-  Building2,
-  ChevronLeft,
-} from "lucide-react";
+import { Building2, ChevronLeft } from "lucide-react";
 import { useTranslations } from "next-intl";
-
-const menuKeys = [
-  { href: "/dashboard", key: "dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/contacts", key: "customers", icon: Users },
-  { href: "/dashboard/orders", key: "orders", icon: FileText },
-  { href: "/dashboard/billing", key: "invoices", icon: Receipt },
-  { href: "/dashboard/expenses", key: "expenses", icon: Wallet },
-  { href: "/dashboard/cashflow", key: "cashflow", icon: TrendingUp },
-  { href: "/dashboard/reporting", key: "reporting", icon: BarChart3 },
-  { href: "/dashboard/alerts", key: "alerts", icon: Bell },
-  { href: "/dashboard/settings", key: "settings", icon: Settings },
-];
+import { menuKeys } from "./nav-config";
 
 interface SidebarProps {
   onClose?: () => void;
@@ -39,7 +16,7 @@ export function Sidebar({ onClose }: SidebarProps) {
 
   return (
     <div
-      className="flex flex-col h-full w-full sm:w-[400px]"
+      className="flex flex-col h-full w-full sm:w-[280px]"
       style={{
         backgroundColor: "white",
         borderRight: "1px solid rgba(0, 0, 0, 0.06)",
@@ -53,20 +30,24 @@ export function Sidebar({ onClose }: SidebarProps) {
           backgroundColor: "#9FAF52",
         }}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 min-w-0 flex-1 overflow-hidden">
           <Building2
             className="h-5 w-5 flex-shrink-0"
             style={{ color: "#000000" }}
           />
-          <h2 className="font-medium" style={{ color: "#000000" }}>
+          <h2 className="font-medium truncate min-w-0" style={{ color: "#000000" }}>
             {t("dashboard")}
           </h2>
         </div>
         {onClose && (
           <button
             type="button"
-            onClick={onClose}
-            className="p-1 rounded transition-colors cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onClose();
+            }}
+            className="flex items-center justify-center min-w-[44px] min-h-[44px] p-2 -m-2 rounded transition-colors cursor-pointer touch-manipulation"
             style={{
               backgroundColor: "transparent",
               border: "none",
@@ -79,7 +60,7 @@ export function Sidebar({ onClose }: SidebarProps) {
             }}
           >
             <ChevronLeft
-              className="h-4 w-4"
+              className="h-5 w-5 pointer-events-none"
               style={{ color: "#000000" }}
             />
           </button>
@@ -112,7 +93,7 @@ export function Sidebar({ onClose }: SidebarProps) {
               }}
             >
               <item.icon className="h-4 w-4 flex-shrink-0" />
-              <span className="flex-1 text-left">{t(item.key)}</span>
+              <span className="flex-1 text-left min-w-0 truncate">{t(item.key)}</span>
             </Link>
           );
         })}

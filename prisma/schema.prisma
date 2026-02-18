@@ -88,6 +88,8 @@ enum ContactRole {
   PROJECT_LEAD
   PURCHASING
   TECHNICAL
+  MANAGEMENT
+  IT_LEAD
   OTHER
 }
 
@@ -109,6 +111,7 @@ model Organization {
   id                   String           @id @default(cuid())
   name                 String
   type                 OrganizationType  @default(CUSTOMER)
+  logoUrl              String?           @map("logo_url")
   parentOrganizationId String?           @map("parent_organization_id")
   paymentTerms         Json?             @map("payment_terms")
   creditLimit          Decimal?         @map("credit_limit") @db.Decimal(12, 2)
@@ -326,6 +329,7 @@ model Milestone {
   id          String    @id @default(cuid())
   orderId     String    @map("order_id")
   name        String
+  description String?   @db.Text
   percentage  Int       @default(0)
   dueDate     DateTime? @map("due_date")
   completedAt DateTime? @map("completed_at")

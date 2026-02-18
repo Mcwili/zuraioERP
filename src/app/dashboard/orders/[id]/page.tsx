@@ -1,10 +1,12 @@
 import { getOrderDetail } from "@/server/actions/orders";
+import { getUsersForAccountOwner } from "@/server/actions/users";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { PageBanner } from "@/components/dashboard/page-banner";
 import { OrderDetailTabs } from "@/components/orders/order-detail-tabs";
 import { EditOrderForm } from "@/components/orders/edit-order-form";
 import { FileText } from "lucide-react";
+import { serializeOrder } from "@/lib/serialize-order";
 
 export default async function OrderDetailPage({
   params,
@@ -12,9 +14,11 @@ export default async function OrderDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const order = await getOrderDetail(id);
+  const orderRaw = await getOrderDetail(id);
 
-  if (!order) notFound();
+  if (!orderRaw) notFound();
+
+  const order = serializeOrder(orderRaw);
 
   const [auditLogs, users, contacts] = await Promise.all([
     prisma.auditLog.findMany({
@@ -23,11 +27,7 @@ export default async function OrderDetailPage({
       orderBy: { createdAt: "desc" },
       take: 50,
     }),
-    prisma.user.findMany({
-      where: { isActive: true },
-      select: { id: true, name: true, email: true },
-      orderBy: { name: "asc" },
-    }),
+    getUsersForAccountOwner(),
     prisma.contact.findMany({
       where: { organizationId: order.organizationId },
       select: { id: true, firstName: true, lastName: true },

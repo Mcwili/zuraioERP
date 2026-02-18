@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { createContact } from "@/server/actions/contacts";
 import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 
 export function CreateContactForm({ organizationId }: { organizationId: string }) {
+  const t = useTranslations("contacts");
+  const tActions = useTranslations("actions");
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -24,7 +27,7 @@ export function CreateContactForm({ organizationId }: { organizationId: string }
         style={{ color: "#9FAF52" }}
       >
         <Plus className="h-4 w-4" />
-        Kontakt hinzufügen
+        {t("addContact")}
       </button>
 
       {open && (
@@ -40,14 +43,14 @@ export function CreateContactForm({ organizationId }: { organizationId: string }
           >
             <div className="p-6 border-b" style={{ borderColor: "#e1dfdd" }}>
               <h3 className="text-lg font-semibold" style={{ color: "#1c1c1c" }}>
-                Kontakt hinzufügen
+                {t("addContact")}
               </h3>
             </div>
             <form action={handleSubmit} className="p-6 space-y-4">
               <input type="hidden" name="organizationId" value={organizationId} />
               <div>
                 <label className="block text-sm font-medium text-zuraio-textMuted mb-1.5">
-                  Foto
+                  {t("labelPhoto")}
                 </label>
                 <input
                   name="photo"
@@ -56,12 +59,12 @@ export function CreateContactForm({ organizationId }: { organizationId: string }
                   className="w-full text-base py-2 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#9FAF52] file:text-black file:cursor-pointer"
                 />
                 <p className="text-xs text-zuraio-textMuted mt-1">
-                  JPEG, PNG oder WebP, max. 2 MB
+                  {t("photoHint")}
                 </p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-zuraio-textMuted mb-1.5">
-                  Vorname
+                  {t("labelFirstName")}
                 </label>
                 <input
                   name="firstName"
@@ -72,7 +75,7 @@ export function CreateContactForm({ organizationId }: { organizationId: string }
               </div>
               <div>
                 <label className="block text-sm font-medium text-zuraio-textMuted mb-1.5">
-                  Nachname
+                  {t("labelLastName")}
                 </label>
                 <input
                   name="lastName"
@@ -83,7 +86,7 @@ export function CreateContactForm({ organizationId }: { organizationId: string }
               </div>
               <div>
                 <label className="block text-sm font-medium text-zuraio-textMuted mb-1.5">
-                  E-Mail
+                  {t("labelEmail")}
                 </label>
                 <input
                   name="email"
@@ -94,7 +97,7 @@ export function CreateContactForm({ organizationId }: { organizationId: string }
               </div>
               <div>
                 <label className="block text-sm font-medium text-zuraio-textMuted mb-1.5">
-                  Telefon
+                  {t("labelPhone")}
                 </label>
                 <input
                   name="phone"
@@ -104,18 +107,20 @@ export function CreateContactForm({ organizationId }: { organizationId: string }
               </div>
               <div>
                 <label className="block text-sm font-medium text-zuraio-textMuted mb-1.5">
-                  Rolle
+                  {t("labelRole")}
                 </label>
                 <select
                   name="role"
                   className="w-full px-3 py-2 text-base border rounded-md focus:outline-none focus:ring-2 focus:ring-[#DCE6B5]"
                   style={{ borderColor: "#e1dfdd" }}
                 >
-                  <option value="BILLING">Rechnung</option>
-                  <option value="PROJECT_LEAD">Projektleitung</option>
-                  <option value="PURCHASING">Einkauf</option>
-                  <option value="TECHNICAL">Technisch</option>
-                  <option value="OTHER">Sonstige</option>
+                  <option value="BILLING">{t("roleBilling")}</option>
+                  <option value="PROJECT_LEAD">{t("roleProjectLead")}</option>
+                  <option value="PURCHASING">{t("rolePurchasing")}</option>
+                  <option value="TECHNICAL">{t("roleTechnical")}</option>
+                  <option value="MANAGEMENT">{t("roleManagement")}</option>
+                  <option value="IT_LEAD">{t("roleItLead")}</option>
+                  <option value="OTHER">{t("roleOther")}</option>
                 </select>
               </div>
               <div className="flex items-center gap-2">
@@ -126,7 +131,7 @@ export function CreateContactForm({ organizationId }: { organizationId: string }
                   className="rounded"
                 />
                 <label htmlFor="isPrimary" className="text-sm text-zuraio-textMuted">
-                  Hauptansprechpartner
+                  {t("primaryContactLabel")}
                 </label>
               </div>
               <div className="flex gap-3 pt-2">
@@ -135,7 +140,7 @@ export function CreateContactForm({ organizationId }: { organizationId: string }
                   className="px-4 py-2 rounded-md text-black font-medium"
                   style={{ backgroundColor: "#9FAF52" }}
                 >
-                  Speichern
+                  {tActions("save")}
                 </button>
                 <button
                   type="button"
@@ -143,7 +148,7 @@ export function CreateContactForm({ organizationId }: { organizationId: string }
                   className="px-4 py-2 border rounded-md"
                   style={{ borderColor: "#e1dfdd" }}
                 >
-                  Abbrechen
+                  {tActions("cancel")}
                 </button>
               </div>
             </form>

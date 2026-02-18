@@ -1,6 +1,15 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { parseDateCH } from "@/lib/date-format";
+
+function parseEndDate(s: string | null): Date | null {
+  if (!s?.trim()) return null;
+  const ch = parseDateCH(s);
+  if (ch) return ch;
+  const iso = new Date(s);
+  return isNaN(iso.getTime()) ? null : iso;
+}
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { canAccessOrders } from "@/lib/permissions";
@@ -110,11 +119,11 @@ export async function updateOrderFromForm(id: string, formData: FormData) {
     throw new Error("Nicht berechtigt");
   }
 
-  const orderNumber = formData.get("orderNumber") as string | null;
   const projectName = formData.get("projectName") as string | null;
   const status = formData.get("status") as OrderStatus | null;
   const contractType = formData.get("contractType") as ContractType | null;
   const endDateStr = formData.get("endDate") as string | null;
+  const endDateParsed = parseEndDate(endDateStr);
   const totalValueStr = formData.get("totalValue") as string | null;
   const currency = formData.get("currency") as string | null;
   const paymentTerms = formData.get("paymentTerms") as string | null;
@@ -123,11 +132,10 @@ export async function updateOrderFromForm(id: string, formData: FormData) {
   const projectLeadId = formData.get("projectLeadId") as string | null;
 
   const data: Parameters<typeof updateOrder>[1] = {
-    orderNumber: orderNumber?.trim() || undefined,
     projectName: projectName?.trim() || undefined,
     status: (status as OrderStatus) || undefined,
     contractType: (contractType as ContractType) || undefined,
-    endDate: endDateStr?.trim() ? new Date(endDateStr) : undefined,
+    endDate: endDateParsed ?? undefined,
     totalValue: totalValueStr?.trim() ? parseFloat(totalValueStr) : undefined,
     currency: currency?.trim() || undefined,
     paymentTerms: paymentTerms?.trim() || undefined,
@@ -137,4 +145,30 @@ export async function updateOrderFromForm(id: string, formData: FormData) {
   };
 
   await updateOrder(id, data);
+}
+
+export async function deleteOrder(id: string) {
+  const session = await getServerSession(authOptions);
+  if (!session || !canAccessOrders(session.user.role)) {
+    throw new Error("Nicht berechtigt");
+  }
+
+  const order = await prisma.order.findUnique({
+    where: { id },
+    select: { orderNumber: true, projectName: true, organizationId: true },
+  });
+  if (!order) throw new Error("Auftrag nicht gefunden");
+
+  await prisma.order.delete({ where: { id } });
+
+  await logAudit({
+    userId: session.user?.id,
+    action: "Order deleted",
+    entityType: "Order",
+    entityId: id,
+    oldValues: { orderNumber: order.orderNumber, projectName: order.projectName } as Record<string, unknown>,
+  });
+
+  revalidatePath("/dashboard/orders");
+  revalidatePath(`/dashboard/contacts/${order.organizationId}`);
 }

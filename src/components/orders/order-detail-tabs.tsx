@@ -11,6 +11,7 @@ import { OrderActualCostsTab } from "./order-actual-costs-tab";
 import { OrderTasksTab } from "./order-tasks-tab";
 import { OrderDocumentsTab } from "./order-documents-tab";
 import { OrderHistoryTab } from "./order-history-tab";
+import { OrderMilestonesSection } from "./order-milestones-section";
 
 type TabId =
   | "overview"
@@ -143,24 +144,10 @@ export function OrderDetailTabs({ order, auditLogs }: OrderDetailTabsProps) {
               </ul>
             )}
           </div>
-          <div className="p-4 border-t" style={{ borderColor: "#e1dfdd" }}>
-            <h3 className="font-semibold text-zuraio-text mb-3">Meilensteine</h3>
-            {order.milestones.length === 0 ? (
-              <p className="text-zuraio-textMuted text-sm">{t("noMilestones")}</p>
-            ) : (
-              <ul className="space-y-2">
-                {order.milestones.map((m) => (
-                  <li
-                    key={m.id}
-                    className="p-3 border rounded"
-                    style={{ borderColor: "#e1dfdd" }}
-                  >
-                    {m.name} – {m.percentage}%
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          <OrderMilestonesSection
+            milestones={order.milestones}
+            orderId={order.id}
+          />
         </div>
       )}
       {activeTab === "payment" && (

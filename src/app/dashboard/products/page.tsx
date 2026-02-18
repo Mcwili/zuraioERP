@@ -40,7 +40,7 @@ export default async function ProductsPage() {
         }
       />
       <div className="px-4 sm:px-6 md:px-8 pt-6 pb-8">
-      <div className="bg-white rounded-lg overflow-hidden border" style={{ borderColor: "#e1dfdd" }}>
+      <div className="bg-white rounded-lg overflow-x-auto overflow-y-hidden border" style={{ borderColor: "#e1dfdd" }}>
         <table className="w-full">
           <thead className="bg-zuraio-sidebar" style={{ borderBottom: "1px solid #e1dfdd" }}>
             <tr>

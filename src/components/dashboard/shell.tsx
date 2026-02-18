@@ -1,32 +1,50 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "./header";
 import { Sidebar } from "./sidebar";
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    if (mq.matches) setSidebarOpen(false);
+    const handler = () => {
+      if (mq.matches) setSidebarOpen(false);
+    };
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
   return (
     <div
       className="h-screen flex flex-col overflow-hidden"
       style={{ backgroundColor: "#f8f9fa" }}
     >
-      {/* Header – oben, volle Breite */}
       <Header
         sidebarOpen={sidebarOpen}
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
       />
 
-      {/* Main Area – wie alt: Panel (fixed) + Content */}
       <div className="flex-1 flex overflow-hidden relative">
-        {/* Sidebar Panel – fixed links unter Header, wie TenantAdminPanel */}
+        {/* Mobile: Overlay mit Backdrop; Desktop: Sidebar links */}
+        {/* Backdrop nur auf Mobile sichtbar wenn Menü offen */}
+        <div
+          className={`md:hidden fixed inset-0 z-30 bg-black/40 transition-opacity duration-300 ${
+            sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+
+        {/* Sidebar – ein-/ausklappbar per ChevronLeft oder Hamburger */}
         <div
           className={`fixed left-0 top-16 bottom-0 z-40 transition-transform duration-300 ease-in-out ${
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
           style={{
-            width: "400px",
+            width: "min(280px, 85vw)",
             maxWidth: "100%",
             boxShadow: "2px 0 8px rgba(0, 0, 0, 0.1)",
           }}
@@ -34,12 +52,11 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           <Sidebar onClose={() => setSidebarOpen(false)} />
         </div>
 
-        {/* Main Content – marginLeft wenn Panel offen, wie alt */}
+        {/* Main Content – Mobile: volle Breite; Desktop: marginLeft wenn Sidebar offen */}
         <main
-          className="flex-1 overflow-auto bg-white transition-all duration-300 p-6 min-w-0"
-          style={{
-            marginLeft: sidebarOpen ? "400px" : "0",
-          }}
+          className={`flex-1 overflow-auto overflow-x-hidden bg-white transition-all duration-300 p-4 md:p-6 min-w-0 z-0 ${
+            sidebarOpen ? "md:ml-[280px]" : ""
+          }`}
         >
           {children}
         </main>
