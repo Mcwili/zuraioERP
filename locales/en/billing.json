@@ -1,4 +1,23 @@
 {
-  "title": "Billing",
-  "subtitle": "Invoicing, Open items"
+  "title": "Invoices",
+  "subtitle": "Invoicing, Open items",
+  "searchPlaceholder": "Search invoices...",
+  "columnNumber": "No.",
+  "columnStatus": "Status",
+  "columnDueDate": "Due",
+  "noInvoices": "No invoices available.",
+  "noInvoicesFound": "No invoices found.",
+  "open": "Open",
+  "newInvoice": "New invoice",
+  "statusDraft": "Draft",
+  "statusPlanned": "Planned",
+  "statusInvoiced": "Invoiced",
+  "statusPaid": "Paid",
+  "selectOrder": "Select order",
+  "selectPlanItems": "Rates from payment plan",
+  "noPlanItems": "No open payments in this order.",
+  "columnAmount": "Amount",
+  "columnDescription": "Description",
+  "generatePdf": "Generate PDF",
+  "generatePdfRequiresOrder": "The invoice must be linked to an order. The PDF will be automatically saved under the order's documents."
 }

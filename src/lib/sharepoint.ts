@@ -61,10 +61,11 @@ export function getGraphClient(): Client {
 export async function uploadDocument(
   organizationId: string,
   orderId: string | null,
-  documentType: "CONTRACT" | "NDA" | "OFFER" | "ORDER" | "CORRESPONDENCE",
+  documentType: "CONTRACT" | "NDA" | "OFFER" | "ORDER" | "CORRESPONDENCE" | "TASK_ATTACHMENT",
   fileName: string,
   fileContent: Buffer,
-  mimeType: string
+  mimeType: string,
+  taskId?: string | null
 ): Promise<{ driveId: string; itemId: string; webUrl?: string }> {
   const driveId = process.env.SHAREPOINT_DRIVE_ID;
   const siteId = process.env.SHAREPOINT_SITE_ID;
@@ -78,13 +79,15 @@ export async function uploadDocument(
   const client = getGraphClient();
 
   const folderPath = orderId
-    ? `Auftraege/${orderId}/${
-        documentType === "OFFER"
-          ? "Offerten"
-          : documentType === "ORDER"
-          ? "Bestellungen"
-          : "Sonstiges"
-      }`
+    ? documentType === "TASK_ATTACHMENT" && taskId
+      ? `Auftraege/${orderId}/Aufgaben/${taskId}`
+      : `Auftraege/${orderId}/${
+          documentType === "OFFER"
+            ? "Offerten"
+            : documentType === "ORDER"
+            ? "Bestellungen"
+            : "Sonstiges"
+        }`
     : `Organisationen/${organizationId}/${
         documentType === "CONTRACT"
           ? "Vertraege"

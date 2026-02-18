@@ -22,6 +22,8 @@ interface GanttOrder {
 
 interface OrdersGanttChartProps {
   orders: GanttOrder[];
+  /** Bei true wird beim Klick auf eine Zeile nicht navigiert (z.B. bei Einzelauftragsansicht) */
+  disableNavigation?: boolean;
 }
 
 const MONTHS_PAST = 2;
@@ -54,7 +56,7 @@ function formatMonthLabel(key: string): string {
   return `${monthNames[parseInt(m, 10) - 1]} ${y}`;
 }
 
-export function OrdersGanttChart({ orders }: OrdersGanttChartProps) {
+export function OrdersGanttChart({ orders, disableNavigation }: OrdersGanttChartProps) {
   const t = useTranslations("orders");
   const router = useRouter();
 
@@ -125,8 +127,8 @@ export function OrdersGanttChart({ orders }: OrdersGanttChartProps) {
           return (
             <div
               key={o.id}
-              onClick={() => router.push(`/dashboard/orders/${o.id}`)}
-              className="flex items-center border-t cursor-pointer transition-colors hover:bg-[#f8f8f7]"
+              onClick={() => !disableNavigation && router.push(`/dashboard/orders/${o.id}`)}
+              className={`flex items-center border-t transition-colors ${!disableNavigation ? "cursor-pointer hover:bg-[#f8f8f7]" : ""}`}
               style={{ borderColor: "#e1dfdd" }}
             >
               <div

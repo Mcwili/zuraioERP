@@ -32,10 +32,13 @@ export function EditOrderForm({ order, users, contacts }: EditOrderFormProps) {
   const [viewMonth, setViewMonth] = useState(new Date());
   const inputRef = useRef<HTMLInputElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
 
   const MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
   const WEEKDAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
   const router = useRouter();
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (open) {
@@ -195,8 +198,7 @@ export function EditOrderForm({ order, users, contacts }: EditOrderFormProps) {
                   >
                     <Calendar className="h-5 w-5" />
                   </button>
-                  {calendarOpen &&
-                    typeof document !== "undefined" &&
+                  {mounted && calendarOpen &&
                     createPortal(
                       <CalendarPopover
                         ref={popoverRef}

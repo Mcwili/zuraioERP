@@ -105,6 +105,7 @@ enum DocumentType {
   OFFER
   ORDER
   CORRESPONDENCE
+  TASK_ATTACHMENT
 }
 
 model Organization {
@@ -147,8 +148,9 @@ model Contact {
   createdAt      DateTime     @default(now()) @map("created_at")
   updatedAt      DateTime     @updatedAt @map("updated_at")
 
-  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  projectLeadOrders Order[]
+  organization       Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  projectLeadOrders  Order[]
+  billingPlanItems   BillingPlanItem[]
 
   @@index([organizationId])
   @@index([email])
@@ -166,7 +168,8 @@ model Address {
   createdAt      DateTime    @default(now()) @map("created_at")
   updatedAt      DateTime    @updatedAt @map("updated_at")
 
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization      Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  billingPlanItems  BillingPlanItem[]
 
   @@index([organizationId])
   @@map("addresses")
@@ -176,6 +179,7 @@ model Document {
   id                  String       @id @default(cuid())
   organizationId      String       @map("organization_id")
   orderId             String?      @map("order_id")
+  orderTaskId         String?      @map("order_task_id")
   type                DocumentType
   fileName            String       @map("file_name")
   sharePointDriveId   String?      @map("share_point_drive_id")
@@ -188,10 +192,12 @@ model Document {
 
   organization        Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   order               Order?      @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  orderTask           OrderTask?   @relation(fields: [orderTaskId], references: [id], onDelete: SetNull)
   uploadedBy          User?        @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
 
   @@index([organizationId])
   @@index([orderId])
+  @@index([orderTaskId])
   @@map("documents")
 }
 
@@ -355,9 +361,10 @@ model OrderVersion {
 }
 
 enum OrderTaskType {
+  TODO
+  REMARK
   MILESTONE
   RENEWAL
-  TODO
 }
 
 model OrderTask {
@@ -370,7 +377,8 @@ model OrderTask {
   notes       String?       @db.Text
   createdAt   DateTime      @default(now()) @map("created_at")
 
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order      Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  documents  Document[]
 
   @@index([orderId])
   @@map("order_tasks")
@@ -457,11 +465,15 @@ model BillingPlanItem {
   status        BillingPlanItemStatus @default(PLANNED)
   invoiced      Boolean              @default(false)
   invoiceId     String?              @map("invoice_id")
+  addressId     String?              @map("address_id")
+  contactId     String?              @map("contact_id")
   paidAt        DateTime?            @map("paid_at")
   createdAt     DateTime             @default(now()) @map("created_at")
 
   billingPlan BillingPlan @relation(fields: [billingPlanId], references: [id], onDelete: Cascade)
   invoice    Invoice?    @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  address    Address?    @relation(fields: [addressId], references: [id], onDelete: SetNull)
+  contact    Contact?    @relation(fields: [contactId], references: [id], onDelete: SetNull)
 
   @@index([billingPlanId])
   @@index([dueDate])

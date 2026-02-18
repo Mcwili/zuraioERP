@@ -8,9 +8,11 @@ import { menuKeys } from "./nav-config";
 
 interface SidebarProps {
   onClose?: () => void;
+  /** Bei true wird beim Klick auf einen Menüpunkt onClose aufgerufen (z.B. für Mobile) */
+  closeOnLinkClick?: boolean;
 }
 
-export function Sidebar({ onClose }: SidebarProps) {
+export function Sidebar({ onClose, closeOnLinkClick }: SidebarProps) {
   const t = useTranslations("nav");
   const pathname = usePathname();
 
@@ -82,6 +84,9 @@ export function Sidebar({ onClose }: SidebarProps) {
               style={{
                 backgroundColor: isActive ? "#DCE6B5" : "transparent",
                 color: "#000000",
+              }}
+              onClick={() => {
+                if (closeOnLinkClick && onClose) onClose();
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = "#DCE6B5";

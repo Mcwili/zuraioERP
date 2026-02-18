@@ -87,7 +87,7 @@ export function OrganizationHeader({ organization }: { organization: Organizatio
             <h2 className="text-xl font-semibold text-zuraio-text mb-1">
               {organization.name}
             </h2>
-            <p className="text-sm text-zuraio-textMuted font-mono" title="Organisations-ID">
+            <p className="text-xs text-zuraio-textMuted" title="Organisations-ID">
               ID: {organization.id}
             </p>
             <p className="text-sm text-zuraio-textMuted mt-2">

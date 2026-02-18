@@ -28,7 +28,7 @@ export function PageBanner({ title, icon: Icon, backHref, actions }: PageBannerP
             <ArrowLeft className="h-5 w-5" style={{ color: "#000000" }} />
           </Link>
         )}
-        <Icon className="h-5 w-5 flex-shrink-0" style={{ color: "#000000" }} />
+        {Icon ? <Icon className="h-5 w-5 flex-shrink-0" style={{ color: "#000000" }} /> : null}
         <h1 className="font-medium text-base truncate min-w-0" style={{ color: "#000000" }}>
           {title}
         </h1>

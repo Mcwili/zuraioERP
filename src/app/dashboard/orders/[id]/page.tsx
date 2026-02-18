@@ -20,13 +20,7 @@ export default async function OrderDetailPage({
 
   const order = serializeOrder(orderRaw);
 
-  const [auditLogs, users, contacts] = await Promise.all([
-    prisma.auditLog.findMany({
-      where: { entityType: "Order", entityId: id },
-      include: { user: { select: { name: true, email: true } } },
-      orderBy: { createdAt: "desc" },
-      take: 50,
-    }),
+  const [users, contacts] = await Promise.all([
     getUsersForAccountOwner(),
     prisma.contact.findMany({
       where: { organizationId: order.organizationId },
@@ -48,7 +42,7 @@ export default async function OrderDetailPage({
         actions={<EditOrderForm order={order} users={users} contacts={contacts} />}
       />
       <div className="px-4 sm:px-6 md:px-8 pt-6 pb-8">
-        <OrderDetailTabs order={order} auditLogs={auditLogs} />
+        <OrderDetailTabs order={order} />
       </div>
     </div>
   );

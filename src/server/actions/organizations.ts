@@ -140,10 +140,7 @@ export async function uploadOrganizationLogo(organizationId: string, formData: F
   await writeFile(filePath, buffer);
   const logoUrl = `/uploads/organizations/${fileName}`;
 
-  await prisma.organization.update({
-    where: { id: organizationId },
-    data: { logoUrl },
-  });
+  await prisma.$executeRaw`UPDATE organizations SET logo_url = ${logoUrl} WHERE id = ${organizationId}`;
 
   revalidatePath("/dashboard/contacts");
   revalidatePath(`/dashboard/contacts/${organizationId}`);

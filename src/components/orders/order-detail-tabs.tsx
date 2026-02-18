@@ -6,31 +6,26 @@ import { OrderHeader } from "./order-header";
 import { OrderFinanceKpi } from "./order-finance-kpi";
 import { OrderPaymentTab } from "./order-payment-tab";
 import { OrderInvoicesTab } from "./order-invoices-tab";
-import { OrderBudgetTab } from "./order-budget-tab";
-import { OrderActualCostsTab } from "./order-actual-costs-tab";
 import { OrderTasksTab } from "./order-tasks-tab";
 import { OrderDocumentsTab } from "./order-documents-tab";
-import { OrderHistoryTab } from "./order-history-tab";
 import { OrderMilestonesSection } from "./order-milestones-section";
+import { OrderDetailGanttChart } from "./order-detail-gantt-chart";
 
 type TabId =
-  | "overview"
+  | "calendar"
+  | "milestones"
   | "payment"
   | "invoices"
-  | "budget"
-  | "costs"
   | "tasks"
-  | "documents"
-  | "history";
+  | "documents";
 
 interface OrderDetailTabsProps {
   order: Awaited<ReturnType<typeof import("@/server/actions/orders").getOrderDetail>>;
-  auditLogs: { id: string; action: string; entityType: string; entityId: string | null; oldValues: unknown; newValues: unknown; createdAt: Date; user?: { name: string | null; email: string } | null }[];
 }
 
-export function OrderDetailTabs({ order, auditLogs }: OrderDetailTabsProps) {
+export function OrderDetailTabs({ order }: OrderDetailTabsProps) {
   const t = useTranslations("orders");
-  const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const [activeTab, setActiveTab] = useState<TabId>("calendar");
 
   if (!order) return null;
 
@@ -73,14 +68,12 @@ export function OrderDetailTabs({ order, auditLogs }: OrderDetailTabsProps) {
   const marginOnTarget = invoiced === 0 || (invoiced - actualCosts) / invoiced >= 0.2;
 
   const tabs: { id: TabId; label: string }[] = [
-    { id: "overview", label: "Positionen" },
+    { id: "calendar", label: t("calendar") },
+    { id: "milestones", label: t("milestones") },
     { id: "payment", label: t("paymentPlan") },
     { id: "invoices", label: t("invoices") },
-    { id: "budget", label: t("budget") },
-    { id: "costs", label: t("actualCosts") },
     { id: "tasks", label: t("tasks") },
     { id: "documents", label: t("documents") },
-    { id: "history", label: t("history") },
   ];
 
   const orderDocuments = order.documents ?? [];
@@ -104,7 +97,7 @@ export function OrderDetailTabs({ order, auditLogs }: OrderDetailTabsProps) {
       />
 
       <div className="flex flex-wrap gap-1 border-b" style={{ borderColor: "#e1dfdd" }}>
-        {tabs.slice(1).map((tab) => (
+        {tabs.map((tab) => (
           <button
             key={tab.id}
             type="button"
@@ -120,33 +113,47 @@ export function OrderDetailTabs({ order, auditLogs }: OrderDetailTabsProps) {
         ))}
       </div>
 
-      {activeTab === "overview" && (
+      {activeTab === "milestones" && (
         <div
           className="rounded-lg border overflow-hidden bg-white space-y-4"
           style={{ borderColor: "#e1dfdd" }}
         >
-          <div className="p-4">
-            <h3 className="font-semibold text-zuraio-text mb-3">Positionen</h3>
-            {order.items.length === 0 ? (
-              <p className="text-zuraio-textMuted text-sm">{t("noItems")}</p>
-            ) : (
-              <ul className="space-y-2">
-                {order.items.map((i) => (
-                  <li
-                    key={i.id}
-                    className="p-3 border rounded"
-                    style={{ borderColor: "#e1dfdd" }}
-                  >
-                    {i.description} – {Number(i.quantity)} × {currency}{" "}
-                    {Number(i.unitPrice).toLocaleString("de-CH")}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
           <OrderMilestonesSection
             milestones={order.milestones}
             orderId={order.id}
+          />
+        </div>
+      )}
+      {activeTab === "calendar" && (
+        <div
+          className="rounded-lg border overflow-hidden bg-white"
+          style={{ borderColor: "#e1dfdd" }}
+        >
+          <OrderDetailGanttChart
+            projectName={order.projectName}
+            orderNumber={order.orderNumber}
+            startDate={order.startDate}
+            endDate={order.endDate}
+            milestones={order.milestones.map((m) => ({
+              id: m.id,
+              name: m.name,
+              dueDate: m.dueDate,
+              completedAt: m.completedAt,
+            }))}
+            tasks={(order.tasks ?? []).map((t) => ({
+              id: t.id,
+              title: t.title,
+              type: t.type,
+              dueDate: t.dueDate,
+              completedAt: t.completedAt,
+            }))}
+            billingPlanItems={(order.billingPlan?.items ?? []).map((i) => ({
+              id: i.id,
+              dueDate: i.dueDate,
+              paidAt: i.paidAt,
+              amount: Number(i.amount),
+              description: i.description,
+            }))}
           />
         </div>
       )}
@@ -155,6 +162,9 @@ export function OrderDetailTabs({ order, auditLogs }: OrderDetailTabsProps) {
           items={order.billingPlan?.items ?? []}
           orderId={order.id}
           currency={currency}
+          totalValue={contractValue}
+          addresses={order.organization?.addresses ?? []}
+          contacts={order.organization?.contacts ?? []}
         />
       )}
       {activeTab === "invoices" && (
@@ -164,22 +174,12 @@ export function OrderDetailTabs({ order, auditLogs }: OrderDetailTabsProps) {
           currency={currency}
         />
       )}
-      {activeTab === "budget" && (
-        <OrderBudgetTab
-          budgetPlans={order.budgetPlans}
-          orderId={order.id}
-          currency={currency}
-        />
-      )}
-      {activeTab === "costs" && (
-        <OrderActualCostsTab
-          actualCosts={order.actualCosts}
-          orderId={order.id}
-          currency={currency}
-        />
-      )}
       {activeTab === "tasks" && (
-        <OrderTasksTab tasks={order.tasks} orderId={order.id} />
+        <OrderTasksTab
+          tasks={order.tasks}
+          orderId={order.id}
+          organizationId={order.organizationId}
+        />
       )}
       {activeTab === "documents" && (
         <OrderDocumentsTab
@@ -187,9 +187,6 @@ export function OrderDetailTabs({ order, auditLogs }: OrderDetailTabsProps) {
           orderId={order.id}
           organizationId={order.organizationId}
         />
-      )}
-      {activeTab === "history" && (
-        <OrderHistoryTab auditLogs={auditLogs} orderId={order.id} />
       )}
     </div>
   );

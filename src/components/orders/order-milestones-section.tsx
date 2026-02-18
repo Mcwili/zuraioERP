@@ -166,9 +166,12 @@ function MilestoneForm({
   );
   const inputRef = useRef<HTMLInputElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
 
   const MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
   const WEEKDAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (!calendarOpen || !inputRef.current) return;
@@ -251,8 +254,7 @@ function MilestoneForm({
           >
             <Calendar className="h-5 w-5" />
           </button>
-          {calendarOpen &&
-            typeof document !== "undefined" &&
+          {mounted && calendarOpen &&
             createPortal(
               <CalendarPopover
                 ref={popoverRef}

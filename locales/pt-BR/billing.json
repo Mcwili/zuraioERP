@@ -1,4 +1,23 @@
 {
-  "title": "Faturamento",
-  "subtitle": "Faturamento, itens em aberto"
+  "title": "Faturas",
+  "subtitle": "Faturamento, itens em aberto",
+  "searchPlaceholder": "Pesquisar faturas...",
+  "columnNumber": "Nº",
+  "columnStatus": "Status",
+  "columnDueDate": "Vencimento",
+  "noInvoices": "Nenhuma fatura disponível.",
+  "noInvoicesFound": "Nenhuma fatura encontrada.",
+  "open": "Abrir",
+  "newInvoice": "Nova fatura",
+  "statusDraft": "Rascunho",
+  "statusPlanned": "Planejado",
+  "statusInvoiced": "Faturado",
+  "statusPaid": "Pago",
+  "selectOrder": "Selecionar pedido",
+  "selectPlanItems": "Parcelas do plano de pagamento",
+  "noPlanItems": "Nenhum pagamento em aberto neste pedido.",
+  "columnAmount": "Valor",
+  "columnDescription": "Descrição",
+  "generatePdf": "Gerar PDF",
+  "generatePdfRequiresOrder": "A fatura deve estar vinculada a um pedido. O PDF será salvo automaticamente nos documentos do pedido."
 }

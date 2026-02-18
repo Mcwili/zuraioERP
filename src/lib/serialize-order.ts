@@ -3,8 +3,7 @@
  * Prisma Decimal-Objekte werden zu number konvertiert, da sie sonst einen 500-Fehler verursachen.
  */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function toSerializable(value: unknown): any {
+function toSerializable(value: unknown): unknown {
   if (value === null || value === undefined) return value;
   if (typeof value === "number" || typeof value === "string" || typeof value === "boolean") return value;
   if (value instanceof Date) return value;

@@ -1,4 +1,23 @@
 {
   "title": "Rechnungen",
-  "subtitle": "Abrechnung, Offene Posten"
+  "subtitle": "Abrechnung, Offene Posten",
+  "searchPlaceholder": "Rechnungen suchen...",
+  "columnNumber": "Nr.",
+  "columnStatus": "Status",
+  "columnDueDate": "Fällig",
+  "noInvoices": "Keine Rechnungen vorhanden.",
+  "noInvoicesFound": "Keine Rechnungen gefunden.",
+  "open": "Öffnen",
+  "newInvoice": "Neue Rechnung",
+  "statusDraft": "Entwurf",
+  "statusPlanned": "Geplant",
+  "statusInvoiced": "Rechnung erstellt",
+  "statusPaid": "Bezahlt",
+  "selectOrder": "Auftrag auswählen",
+  "selectPlanItems": "Raten aus Zahlungsplan",
+  "noPlanItems": "Keine offenen Zahlungen in diesem Auftrag.",
+  "columnAmount": "Betrag",
+  "columnDescription": "Beschreibung",
+  "generatePdf": "PDF generieren",
+  "generatePdfRequiresOrder": "Die Rechnung muss einem Auftrag zugeordnet sein. Das PDF wird automatisch unter den Dokumenten des Auftrags abgelegt."
 }

@@ -4,15 +4,26 @@ import { useState, useEffect } from "react";
 import { Header } from "./header";
 import { Sidebar } from "./sidebar";
 
-export function DashboardShell({ children }: { children: React.ReactNode }) {
+type UserProfile = { id: string; email: string; name: string | null; imageUrl: string | null } | null;
+
+export function DashboardShell({
+  children,
+  userProfile,
+}: {
+  children: React.ReactNode;
+  userProfile: UserProfile;
+}) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 767px)");
-    if (mq.matches) setSidebarOpen(false);
     const handler = () => {
-      if (mq.matches) setSidebarOpen(false);
+      const mobile = mq.matches;
+      setIsMobile(mobile);
+      if (mobile) setSidebarOpen(false);
     };
+    handler();
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
   }, []);
@@ -25,6 +36,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       <Header
         sidebarOpen={sidebarOpen}
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        userProfile={userProfile}
       />
 
       <div className="flex-1 flex overflow-hidden relative">
@@ -49,7 +61,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             boxShadow: "2px 0 8px rgba(0, 0, 0, 0.1)",
           }}
         >
-          <Sidebar onClose={() => setSidebarOpen(false)} />
+          <Sidebar
+            onClose={() => setSidebarOpen(false)}
+            closeOnLinkClick={isMobile}
+          />
         </div>
 
         {/* Main Content – Mobile: volle Breite; Desktop: marginLeft wenn Sidebar offen */}

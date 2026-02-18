@@ -2,17 +2,19 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { updateOrganization } from "@/server/actions/organizations";
+import { updateOrganization, deleteOrganization } from "@/server/actions/organizations";
 import { useRouter } from "next/navigation";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import type { Organization } from "@prisma/client";
 
 export function EditOrganizationForm({ organization }: { organization: Organization }) {
   const t = useTranslations("contacts");
   const tActions = useTranslations("actions");
   const [open, setOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const router = useRouter();
 
   async function handleSubmit(formData: FormData) {
@@ -29,6 +31,29 @@ export function EditOrganizationForm({ organization }: { organization: Organizat
       setError(e instanceof Error ? e.message : t("saveError"));
     } finally {
       setPending(false);
+    }
+  }
+
+  function handleDeleteClick(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setError("");
+    setDeleteConfirmOpen(true);
+  }
+
+  async function handleDeleteConfirm() {
+    setDeleting(true);
+    setError("");
+    try {
+      await deleteOrganization(organization.id);
+      setDeleteConfirmOpen(false);
+      setOpen(false);
+      router.push("/dashboard/contacts");
+      router.refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : t("deleteError"));
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -103,25 +128,93 @@ export function EditOrganizationForm({ organization }: { organization: Organizat
                   {error}
                 </div>
               )}
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleDeleteClick}
+                  disabled={pending || deleting}
+                  className="p-2 rounded-md transition-colors hover:bg-red-50 disabled:opacity-50"
+                  style={{ color: "#605e5c" }}
+                  title={t("deleteOrganization")}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+                <div className="flex gap-3">
+                  <button
+                    type="submit"
+                    disabled={pending}
+                    className="px-4 py-2 rounded-md text-black font-medium disabled:opacity-50"
+                    style={{ backgroundColor: "#9FAF52" }}
+                  >
+                    {pending ? `${tActions("save")}…` : tActions("save")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setOpen(false)}
+                    className="px-4 py-2 border rounded-md"
+                    style={{ borderColor: "#e1dfdd" }}
+                  >
+                    {tActions("cancel")}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {deleteConfirmOpen && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+          onClick={() => !deleting && setDeleteConfirmOpen(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-lg shadow-xl overflow-hidden bg-white"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 border-b" style={{ borderColor: "#e1dfdd" }}>
+              <h3 className="text-lg font-semibold" style={{ color: "#1c1c1c" }}>
+                {t("deleteOrganization")}
+              </h3>
+            </div>
+            <div className="p-6 space-y-4">
+              <p className="text-sm text-zuraio-textMuted">
+                {t("deleteOrganizationConfirm", { name: organization.name })}
+              </p>
+              {error && (
+                <div
+                  className="p-3 rounded-lg text-sm"
+                  style={{
+                    backgroundColor: "rgba(209, 52, 56, 0.05)",
+                    border: "1px solid rgba(209, 52, 56, 0.2)",
+                    color: "#d13438",
+                  }}
+                >
+                  {error}
+                </div>
+              )}
               <div className="flex gap-3 pt-2">
                 <button
-                  type="submit"
-                  disabled={pending}
-                  className="px-4 py-2 rounded-md text-black font-medium disabled:opacity-50"
-                  style={{ backgroundColor: "#9FAF52" }}
+                  type="button"
+                  onClick={handleDeleteConfirm}
+                  disabled={deleting}
+                  className="px-4 py-2 rounded-md text-white font-medium disabled:opacity-50"
+                  style={{ backgroundColor: "#d13438" }}
                 >
-                  {pending ? `${tActions("save")}…` : tActions("save")}
+                  {deleting ? "…" : tActions("delete")}
                 </button>
                 <button
                   type="button"
-                  onClick={() => setOpen(false)}
-                  className="px-4 py-2 border rounded-md"
+                  onClick={() => setDeleteConfirmOpen(false)}
+                  disabled={deleting}
+                  className="px-4 py-2 border rounded-md disabled:opacity-50"
                   style={{ borderColor: "#e1dfdd" }}
                 >
                   {tActions("cancel")}
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}

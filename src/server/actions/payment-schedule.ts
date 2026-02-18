@@ -13,6 +13,8 @@ export async function addPaymentScheduleItem(
     amount: number;
     dueDate: Date;
     description?: string;
+    addressId?: string | null;
+    contactId?: string | null;
   }
 ) {
   const session = await getServerSession(authOptions);
@@ -39,6 +41,8 @@ export async function addPaymentScheduleItem(
       amount: data.amount,
       dueDate: data.dueDate,
       description: data.description,
+      addressId: data.addressId ?? undefined,
+      contactId: data.contactId ?? undefined,
       status: "PLANNED",
     },
   });
@@ -53,4 +57,53 @@ export async function addPaymentScheduleItem(
 
   revalidatePath(`/dashboard/orders/${orderId}`);
   return item;
+}
+
+export async function updatePaymentScheduleItem(
+  itemId: string,
+  orderId: string,
+  data: {
+    amount: number;
+    dueDate: Date;
+    description?: string | null;
+    addressId?: string | null;
+    contactId?: string | null;
+  }
+) {
+  const session = await getServerSession(authOptions);
+  if (!session || !canAccessOrders(session.user.role)) {
+    throw new Error("Nicht berechtigt");
+  }
+
+  const existing = await prisma.billingPlanItem.findFirst({
+    where: { id: itemId },
+    include: { billingPlan: true },
+  });
+  if (!existing || existing.billingPlan.orderId !== orderId) {
+    throw new Error("Rate nicht gefunden");
+  }
+  if (existing.status !== "PLANNED") {
+    throw new Error("Nur geplante Raten können bearbeitet werden");
+  }
+
+  await prisma.billingPlanItem.update({
+    where: { id: itemId },
+    data: {
+      amount: data.amount,
+      dueDate: data.dueDate,
+      description: data.description ?? undefined,
+      addressId: data.addressId ?? undefined,
+      contactId: data.contactId ?? undefined,
+    },
+  });
+
+  await logAudit({
+    userId: session.user?.id,
+    action: "Payment schedule item updated",
+    entityType: "Order",
+    entityId: orderId,
+    newValues: { itemId, ...data },
+  });
+
+  revalidatePath(`/dashboard/orders/${orderId}`);
 }
