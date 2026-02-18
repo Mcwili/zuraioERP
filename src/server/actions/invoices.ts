@@ -109,7 +109,9 @@ export async function generateInvoicePdf(invoiceId: string) {
     footerDate: formatDateLong(new Date()),
   });
 
-  const buffer = (await renderToBuffer(pdfElement)) as Buffer;
+  const buffer = (await renderToBuffer(
+    pdfElement as React.ReactElement
+  )) as Buffer;
   const fileName = `Rechnung_${invoice.number.replace(/[/\\?%*:|"<>]/g, "_")}.pdf`;
 
   try {
