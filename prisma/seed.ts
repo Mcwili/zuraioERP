@@ -4,22 +4,38 @@ import { hash } from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
-  const existing = await prisma.user.findFirst();
-  if (existing) {
-    console.log("Admin bereits vorhanden.");
-    return;
-  }
-
-  const passwordHash = await hash("Admin123!@#", 12);
-  await prisma.user.create({
-    data: {
+  const usersToCreate = [
+    {
       email: "admin@zuraio.local",
-      passwordHash,
+      password: "Admin123!@#",
       name: "Admin",
-      role: "ADMIN",
+      role: "ADMIN" as const,
     },
-  });
-  console.log("Admin-Benutzer erstellt: admin@zuraio.local / Admin123!@#");
+    {
+      email: "michael.wili@zuraio.ch",
+      password: "ImSand11",
+      name: "Michael Wili",
+      role: "ADMIN" as const,
+    },
+  ];
+
+  for (const u of usersToCreate) {
+    const existing = await prisma.user.findUnique({ where: { email: u.email } });
+    if (existing) {
+      console.log(`Benutzer ${u.email} bereits vorhanden.`);
+      continue;
+    }
+    const passwordHash = await hash(u.password, 12);
+    await prisma.user.create({
+      data: {
+        email: u.email,
+        passwordHash,
+        name: u.name,
+        role: u.role,
+      },
+    });
+    console.log(`Benutzer erstellt: ${u.email}`);
+  }
 }
 
 main()
