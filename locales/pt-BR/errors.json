@@ -1,5 +1,1 @@
-{
-  "generic": "Ocorreu um erro.",
-  "notFound": "Não encontrado.",
-  "unauthorized": "Não autorizado."
-}
+{"generic":"Ocorreu um erro.","notFound":"Não encontrado.","unauthorized":"Não autorizado.","tryAgain":"Tentar novamente","orderLoadError":"Ocorreu um erro ao carregar o pedido.","webpackReloadHint":"Isso pode acontecer após uma atualização. Recarregue a página (F5 ou Ctrl+R).","unexpectedError":"Ocorreu um erro inesperado"}

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 
-export default function OrdersError({
+export default function ReportingError({
   error,
   reset,
 }: {
@@ -11,8 +11,9 @@ export default function OrdersError({
   reset: () => void;
 }) {
   const t = useTranslations("errors");
+
   useEffect(() => {
-    console.error("Orders page error:", error);
+    console.error("Reporting page error:", error);
   }, [error]);
 
   return (

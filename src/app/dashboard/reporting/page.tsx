@@ -49,9 +49,10 @@ export default async function ReportingPage({
   }>;
 }) {
   const t = await getTranslations("nav");
+  const tErrors = await getTranslations("errors");
   const session = await getServerSession(authOptions);
   if (!session || !canAccessReporting(session.user.role)) {
-    return <p>Nicht berechtigt</p>;
+    return <p>{tErrors("unauthorized")}</p>;
   }
 
   const params = await searchParams;

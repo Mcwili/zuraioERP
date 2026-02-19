@@ -84,19 +84,19 @@ export default async function SettingsPage() {
                 <thead>
                   <tr style={{ backgroundColor: "#f9f9f8" }}>
                     <th style={{ borderColor: "#e1dfdd" }} className="text-left text-sm font-medium text-zuraio-textMuted px-4 py-3 border-b">
-                      E-Mail
+                      {tSettings("email")}
                     </th>
                     <th style={{ borderColor: "#e1dfdd" }} className="text-left text-sm font-medium text-zuraio-textMuted px-4 py-3 border-b">
-                      Name
+                      {tSettings("name")}
                     </th>
                     <th style={{ borderColor: "#e1dfdd" }} className="text-left text-sm font-medium text-zuraio-textMuted px-4 py-3 border-b">
-                      Rolle
+                      {tSettings("role")}
                     </th>
                     <th style={{ borderColor: "#e1dfdd" }} className="text-left text-sm font-medium text-zuraio-textMuted px-4 py-3 border-b">
-                      Status
+                      {tSettings("status")}
                     </th>
                     <th style={{ borderColor: "#e1dfdd" }} className="text-right text-sm font-medium text-zuraio-textMuted px-4 py-3 border-b">
-                      Aktionen
+                      {tSettings("actions")}
                     </th>
                   </tr>
                 </thead>
@@ -120,7 +120,7 @@ export default async function SettingsPage() {
                               : "text-zuraio-textMuted"
                           }
                         >
-                          {u.isActive ? "Aktiv" : "Inaktiv"}
+                          {u.isActive ? tSettings("active") : tSettings("inactive")}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right">

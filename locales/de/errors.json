@@ -1,5 +1,9 @@
 {
   "generic": "Ein Fehler ist aufgetreten.",
   "notFound": "Nicht gefunden.",
-  "unauthorized": "Nicht autorisiert."
+  "unauthorized": "Nicht autorisiert.",
+  "tryAgain": "Erneut versuchen",
+  "orderLoadError": "Beim Laden des Auftrags ist ein Fehler aufgetreten.",
+  "webpackReloadHint": "Dies kann nach einem Update auftreten. Bitte laden Sie die Seite neu (F5 oder Strg+R).",
+  "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
 }

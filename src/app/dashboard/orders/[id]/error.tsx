@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export default function OrderDetailError({
   error,
@@ -10,6 +11,8 @@ export default function OrderDetailError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations("errors");
+  const tCommon = useTranslations("common");
   useEffect(() => {
     console.error("Order detail error:", error);
   }, [error]);
@@ -19,10 +22,10 @@ export default function OrderDetailError({
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[200px] gap-4 p-6">
-      <p className="text-zuraio-textMuted text-sm">Beim Laden des Auftrags ist ein Fehler aufgetreten.</p>
+      <p className="text-zuraio-textMuted text-sm">{t("orderLoadError")}</p>
       {isWebpackCallError && (
         <p className="text-xs text-zuraio-textMuted max-w-md text-center">
-          Dies kann nach einem Update auftreten. Bitte laden Sie die Seite neu (F5 oder Strg+R).
+          {t("webpackReloadHint")}
         </p>
       )}
       <div className="flex gap-2">
@@ -32,14 +35,14 @@ export default function OrderDetailError({
           className="px-4 py-2 text-sm rounded border bg-white hover:bg-[#f8f8f7]"
           style={{ borderColor: "#e1dfdd" }}
         >
-          Erneut versuchen
+          {t("tryAgain")}
         </button>
         <Link
           href="/dashboard/orders"
           className="px-4 py-2 text-sm rounded border bg-white hover:bg-[#f8f8f7]"
           style={{ borderColor: "#e1dfdd" }}
         >
-          Zurück zur Liste
+          {tCommon("actions.backToList")}
         </Link>
       </div>
     </div>

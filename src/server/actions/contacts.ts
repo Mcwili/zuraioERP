@@ -7,8 +7,7 @@ import { canAccessContacts } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import type { ContactRole } from "@prisma/client";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { fileToBase64DataUrl } from "@/lib/image-base64";
 
 const contactSchema = z.object({
   organizationId: z.string().min(1),
@@ -92,14 +91,7 @@ export async function createContact(formData: FormData) {
     if (photo.size > PHOTO_MAX_SIZE) {
       throw new Error("Foto zu gross (max 2 MB)");
     }
-    const ext = photo.type === "image/png" ? ".png" : photo.type === "image/webp" ? ".webp" : ".jpg";
-    const dir = path.join(process.cwd(), "public", "uploads", "contacts");
-    await mkdir(dir, { recursive: true });
-    const fileName = `${contact.id}${ext}`;
-    const filePath = path.join(dir, fileName);
-    const buffer = Buffer.from(await photo.arrayBuffer());
-    await writeFile(filePath, buffer);
-    photoUrl = `/uploads/contacts/${fileName}`;
+    photoUrl = await fileToBase64DataUrl(photo);
     await prisma.contact.update({
       where: { id: contact.id },
       data: { photoUrl },
@@ -170,14 +162,7 @@ export async function updateContactFromForm(id: string, formData: FormData) {
     if (photo.size > PHOTO_MAX_SIZE) {
       throw new Error("Foto zu gross (max 2 MB)");
     }
-    const ext = photo.type === "image/png" ? ".png" : photo.type === "image/webp" ? ".webp" : ".jpg";
-    const dir = path.join(process.cwd(), "public", "uploads", "contacts");
-    await mkdir(dir, { recursive: true });
-    const fileName = `${contact.id}${ext}`;
-    const filePath = path.join(dir, fileName);
-    const buffer = Buffer.from(await photo.arrayBuffer());
-    await writeFile(filePath, buffer);
-    photoUrl = `/uploads/contacts/${fileName}`;
+    photoUrl = await fileToBase64DataUrl(photo);
   }
 
   const updated = await prisma.contact.update({

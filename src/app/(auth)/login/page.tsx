@@ -43,8 +43,8 @@ function LoginForm() {
       return;
     }
 
-    // Vollständige Navigation statt router.push, damit die Session-Cookies
-    // vor dem nächsten Request gesetzt sind (bekanntes NextAuth-Problem bei redirect: false)
+    // Session-Refresh vor Redirect (behebt doppeltes Login bei redirect: false)
+    await fetch("/api/auth/session", { method: "GET", cache: "no-store" });
     window.location.href = callbackUrl;
   }
 
@@ -207,18 +207,21 @@ function LoginForm() {
   );
 }
 
+function LoginLoadingFallback() {
+  const t = useTranslations("common");
+  return (
+    <div
+      className="min-h-screen flex items-center justify-center"
+      style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #DCE6B5 100%)" }}
+    >
+      {t("app.loading")}
+    </div>
+  );
+}
+
 export default function LoginPage() {
   return (
-    <Suspense
-      fallback={
-        <div
-          className="min-h-screen flex items-center justify-center"
-          style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #DCE6B5 100%)" }}
-        >
-          Laden...
-        </div>
-      }
-    >
+    <Suspense fallback={<LoginLoadingFallback />}>
       <LoginForm />
     </Suspense>
   );

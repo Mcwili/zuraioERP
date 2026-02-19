@@ -11,6 +11,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getExpensesChartData } from "@/server/actions/expenses";
 
@@ -43,6 +44,7 @@ interface ExpensesChartProps {
 }
 
 export function ExpensesChart({ data: initialData, filters }: ExpensesChartProps) {
+  const t = useTranslations("expenses");
   const [data, setData] = useState(initialData);
   const [loading, setLoading] = useState(false);
 
@@ -90,7 +92,7 @@ export function ExpensesChart({ data: initialData, filters }: ExpensesChartProps
     <div className="rounded-lg border bg-white p-4" style={{ borderColor: "#e1dfdd" }}>
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-sm font-medium" style={{ color: "#1c1c1c" }}>
-          Ausgaben – Geplant vs. Effektiv
+          {t("chartPlannedVsActual")}
         </h3>
         <div className="flex items-center gap-1">
           <button
@@ -116,7 +118,7 @@ export function ExpensesChart({ data: initialData, filters }: ExpensesChartProps
       <div className="relative h-[280px] w-full">
         {loading && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70">
-            <span className="text-sm" style={{ color: "#605e5c" }}>Laden…</span>
+            <span className="text-sm" style={{ color: "#605e5c" }}>{t("loading")}</span>
           </div>
         )}
         <ResponsiveContainer width="100%" height="100%">
@@ -145,14 +147,14 @@ export function ExpensesChart({ data: initialData, filters }: ExpensesChartProps
               }}
               formatter={(value: number | undefined, name?: string) => [
                 `CHF ${Number(value ?? 0).toLocaleString("de-CH")}`,
-                name === "planned" ? "Geplant" : "Effektiv",
+                name === "planned" ? t("chartPlanned") : t("chartActual"),
               ]}
               labelFormatter={(label) => label}
             />
             <Legend
               wrapperStyle={{ fontSize: 12 }}
               formatter={(value) =>
-                value === "planned" ? "Geplant" : "Effektiv"
+                value === "planned" ? t("chartPlanned") : t("chartActual")
               }
             />
             <Area

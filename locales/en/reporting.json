@@ -33,6 +33,7 @@
   "dueDate": "Due Date",
   "daysOverdue": "Days Overdue",
   "aging": "Aging",
+  "sumsByAging": "Sums by Aging",
   "planned": "Planned",
   "actual": "Actual",
   "variance": "Variance",

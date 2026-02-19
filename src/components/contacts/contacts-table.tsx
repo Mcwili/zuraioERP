@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronRight, ChevronUp, ChevronDown, Search, Building2 } from "lucide-react";
@@ -165,11 +166,14 @@ export function ContactsTable({ organizations }: ContactsTableProps) {
             >
               <td className="px-3 py-2 w-12">
                 {org.logoUrl ? (
-                  <div className="w-10 h-10 rounded flex items-center justify-center overflow-hidden flex-shrink-0 bg-[#f8f8f7]">
-                    <img
+                  <div className="relative w-10 h-10 rounded flex items-center justify-center overflow-hidden flex-shrink-0 bg-[#f8f8f7]">
+                    <Image
                       src={org.logoUrl}
                       alt={org.name}
-                      className="max-w-full max-h-full object-contain"
+                      fill
+                      className="object-contain"
+                      sizes="40px"
+                      unoptimized
                     />
                   </div>
                 ) : (

@@ -7,8 +7,7 @@ import { canAccessContacts } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import type { OrganizationType } from "@prisma/client";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { fileToBase64DataUrl } from "@/lib/image-base64";
 
 const LOGO_MIME = ["image/jpeg", "image/png", "image/webp", "image/svg+xml"];
 const LOGO_MAX_SIZE = 2 * 1024 * 1024; // 2 MB
@@ -131,16 +130,12 @@ export async function uploadOrganizationLogo(organizationId: string, formData: F
     throw new Error("Logo zu gross (max 2 MB)");
   }
 
-  const ext = logo.type === "image/svg+xml" ? ".svg" : logo.type === "image/png" ? ".png" : logo.type === "image/webp" ? ".webp" : ".jpg";
-  const dir = path.join(process.cwd(), "public", "uploads", "organizations");
-  await mkdir(dir, { recursive: true });
-  const fileName = `${organizationId}${ext}`;
-  const filePath = path.join(dir, fileName);
-  const buffer = Buffer.from(await logo.arrayBuffer());
-  await writeFile(filePath, buffer);
-  const logoUrl = `/uploads/organizations/${fileName}`;
+  const logoUrl = await fileToBase64DataUrl(logo as File);
 
-  await prisma.$executeRaw`UPDATE organizations SET logo_url = ${logoUrl} WHERE id = ${organizationId}`;
+  await prisma.organization.update({
+    where: { id: organizationId },
+    data: { logoUrl },
+  });
 
   revalidatePath("/dashboard/contacts");
   revalidatePath(`/dashboard/contacts/${organizationId}`);

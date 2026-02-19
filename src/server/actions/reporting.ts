@@ -571,7 +571,7 @@ export async function getOpenItemsData(filters?: ReportingFilters) {
   const items: {
     id: string;
     number: string;
-    dueDate: Date;
+    dueDate: string;
     total: number;
     paid: number;
     open: number;
@@ -602,7 +602,7 @@ export async function getOpenItemsData(filters?: ReportingFilters) {
     items.push({
       id: inv.id,
       number: inv.number,
-      dueDate: inv.dueDate,
+      dueDate: new Date(inv.dueDate).toISOString(),
       total,
       paid,
       open,

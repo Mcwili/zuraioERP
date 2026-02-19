@@ -67,5 +67,9 @@
   "noOrder": "No order",
   "fileHint": "PDF, DOC, DOCX, XLS, XLSX, TXT, CSV, JPG, PNG, GIF, WEBP (max. 10 MB)",
   "upload": "Upload",
-  "uploadFailed": "Upload failed"
+  "uploadFailed": "Upload failed",
+  "chartPlannedVsActual": "Expenses – Planned vs. Actual",
+  "chartPlanned": "Planned",
+  "chartActual": "Actual",
+  "loading": "Loading…"
 }

@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 interface OpenItem {
   id: string;
   number: string;
-  dueDate: Date;
+  dueDate: string;
   total: number;
   paid: number;
   open: number;
@@ -28,7 +28,7 @@ interface OpenItemsReportProps {
 export function OpenItemsReport({ data }: OpenItemsReportProps) {
   const t = useTranslations("reporting");
   const format = (v: number) => v.toLocaleString("de-CH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const formatDate = (d: Date) => new Date(d).toLocaleDateString("de-CH");
+  const formatDate = (d: string) => new Date(d).toLocaleDateString("de-CH");
 
   return (
     <div className="space-y-6">
@@ -38,7 +38,7 @@ export function OpenItemsReport({ data }: OpenItemsReportProps) {
           style={{ borderColor: "#e1dfdd" }}
         >
           <h3 className="mb-3 text-sm font-medium" style={{ color: "#1c1c1c" }}>
-            Summen nach Alterung
+            {t("sumsByAging")}
           </h3>
           <div className="flex flex-wrap gap-4">
             {data.byAging.map((a) => (
@@ -71,7 +71,7 @@ export function OpenItemsReport({ data }: OpenItemsReportProps) {
                 {t("dueDate")}
               </th>
               <th className="text-right px-3 py-2 text-xs font-medium text-zuraio-textMuted">
-                Offen
+                {t("open")}
               </th>
               <th className="text-right px-3 py-2 text-xs font-medium text-zuraio-textMuted">
                 {t("daysOverdue")}

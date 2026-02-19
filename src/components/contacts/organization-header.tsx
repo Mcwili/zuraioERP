@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Building2, Camera } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { uploadOrganizationLogo } from "@/server/actions/organizations";
@@ -40,13 +41,16 @@ export function OrganizationHeader({ organization }: { organization: Organizatio
         <div className="relative">
           {organization.logoUrl ? (
             <div
-              className="w-24 h-24 rounded-lg border flex items-center justify-center overflow-hidden p-1"
+              className="relative w-24 h-24 rounded-lg border overflow-hidden p-1"
               style={{ borderColor: "#e1dfdd", backgroundColor: "#f8f8f7" }}
             >
-              <img
+              <Image
                 src={organization.logoUrl}
                 alt={organization.name}
-                className="max-w-full max-h-full w-auto h-auto object-contain"
+                fill
+                className="object-contain"
+                sizes="96px"
+                unoptimized
               />
             </div>
           ) : (

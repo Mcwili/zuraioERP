@@ -33,6 +33,7 @@
   "dueDate": "Vencimento",
   "daysOverdue": "Dias em Atraso",
   "aging": "Envelhecimento",
+  "sumsByAging": "Somas por Envelhecimento",
   "planned": "Planejado",
   "actual": "Real",
   "variance": "Variação",
