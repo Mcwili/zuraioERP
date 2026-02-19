@@ -2,13 +2,12 @@
 
 import { signIn } from "next-auth/react";
 import { useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("auth");
   const params = searchParams ?? new URLSearchParams();
@@ -44,8 +43,9 @@ function LoginForm() {
       return;
     }
 
-    router.push(callbackUrl);
-    router.refresh();
+    // Vollständige Navigation statt router.push, damit die Session-Cookies
+    // vor dem nächsten Request gesetzt sind (bekanntes NextAuth-Problem bei redirect: false)
+    window.location.href = callbackUrl;
   }
 
   return (
