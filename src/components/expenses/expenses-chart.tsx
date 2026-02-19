@@ -143,8 +143,8 @@ export function ExpensesChart({ data: initialData, filters }: ExpensesChartProps
                 border: "1px solid #e1dfdd",
                 borderRadius: "6px",
               }}
-              formatter={(value: number, name: string) => [
-                `CHF ${Number(value).toLocaleString("de-CH")}`,
+              formatter={(value: number | undefined, name: string) => [
+                `CHF ${Number(value ?? 0).toLocaleString("de-CH")}`,
                 name === "planned" ? "Geplant" : "Effektiv",
               ]}
               labelFormatter={(label) => label}
