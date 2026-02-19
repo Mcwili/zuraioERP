@@ -10,6 +10,14 @@ export function formatDateCH(d: Date): string {
   return `${day}/${month}/${year}`;
 }
 
+/** Formatiert ein Date-Objekt ins Format dd.mm.yyyy */
+export function formatDateCHDot(d: Date): string {
+  const day = d.getDate().toString().padStart(2, "0");
+  const month = (d.getMonth() + 1).toString().padStart(2, "0");
+  const year = d.getFullYear();
+  return `${day}.${month}.${year}`;
+}
+
 /** Parst eine Datumszeichenkette im Format dd/mm/yyyy zu Date (akzeptiert / und .) */
 export function parseDateCH(s: string): Date | null {
   const trimmed = s?.trim();

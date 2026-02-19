@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { canAccessContacts, canAccessOrders } from "@/lib/permissions";
+import { canAccessContacts, canAccessOrders, canAccessExpenses } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { uploadDocument } from "@/lib/sharepoint";
 import type { DocumentType } from "@prisma/client";
@@ -198,6 +198,75 @@ export async function uploadOrderDocument(
     });
 
     revalidatePath(`/dashboard/orders/${orderId}`);
+  } catch (err) {
+    console.error("SharePoint upload error:", err);
+    throw new Error(
+      "Upload fehlgeschlagen. Prüfen Sie die SharePoint-Konfiguration."
+    );
+  }
+}
+
+export async function uploadExpenseReceipt(
+  formData: FormData,
+  expenseActualCostId: string
+) {
+  const session = await getServerSession(authOptions);
+  if (!session || !canAccessExpenses(session.user.role)) {
+    throw new Error("Nicht berechtigt");
+  }
+
+  const cost = await prisma.expenseActualCost.findUnique({
+    where: { id: expenseActualCostId },
+    select: { organizationId: true, orderId: true, order: { select: { organizationId: true } } },
+  });
+  if (!cost) throw new Error("Effektive Kosten nicht gefunden");
+
+  const organizationId = cost.organizationId ?? cost.order?.organizationId ?? null;
+  if (!organizationId) {
+    throw new Error("Beleg-Upload erfordert einen Kunden oder einen Auftrag mit Kunde.");
+  }
+
+  const file = formData.get("file") as File;
+  if (!file) throw new Error("Datei erforderlich");
+  if (!ALLOWED_MIME.includes(file.type))
+    throw new Error(
+      "Dateityp nicht erlaubt (PDF, DOC, DOCX, XLS, XLSX, TXT, CSV, JPG, PNG, GIF, WEBP)"
+    );
+  if (file.size > MAX_SIZE) throw new Error("Datei zu gross (max 10 MB)");
+
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const fileName = sanitizeFileName(file.name);
+
+  try {
+    const result = await uploadDocument(
+      organizationId,
+      null,
+      "EXPENSE_RECEIPT",
+      fileName,
+      buffer,
+      file.type,
+      undefined,
+      expenseActualCostId
+    );
+
+    await prisma.document.create({
+      data: {
+        organizationId,
+        orderId: cost.orderId,
+        expenseActualCostId,
+        type: "EXPENSE_RECEIPT",
+        fileName,
+        sharePointDriveId: result.driveId,
+        sharePointItemId: result.itemId,
+        sharePointWebUrl: result.webUrl ?? null,
+        mimeType: file.type,
+        size: file.size,
+        uploadedById: session.user.id,
+      },
+    });
+
+    revalidatePath("/dashboard/expenses");
+    if (cost.orderId) revalidatePath(`/dashboard/orders/${cost.orderId}`);
   } catch (err) {
     console.error("SharePoint upload error:", err);
     throw new Error(

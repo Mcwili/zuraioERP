@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { addPaymentScheduleItem, updatePaymentScheduleItem } from "@/server/actions/payment-schedule";
 import { useRouter } from "next/navigation";
-import { parseDateCH, formatDateCH } from "@/lib/date-format";
+import { parseDateCH, formatDateCHDot } from "@/lib/date-format";
 import type { Address, Contact } from "@prisma/client";
 
 interface BillingPlanItemWithIds {
@@ -49,7 +49,7 @@ export function AddRateModal({
 
   const amountVal = item ? (typeof item.amount === "object" && "toNumber" in item.amount ? (item.amount as { toNumber: () => number }).toNumber() : Number(item.amount)) : "";
   const dueDateVal = item ? (typeof item.dueDate === "string" ? new Date(item.dueDate) : item.dueDate) : null;
-  const dueDateStr = dueDateVal ? formatDateCH(dueDateVal) : "";
+  const dueDateStr = dueDateVal ? formatDateCHDot(dueDateVal) : "";
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -104,7 +104,6 @@ export function AddRateModal({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
-      onClick={onClose}
     >
       <div
         className="w-full max-w-md rounded-lg shadow-xl overflow-hidden bg-white max-h-[90vh] flex flex-col"
@@ -148,7 +147,7 @@ export function AddRateModal({
             <input
               name="dueDate"
               type="text"
-              placeholder="DD.MM.YYYY"
+              placeholder="dd.mm.yyyy"
               required
               defaultValue={dueDateStr}
               className="w-full px-3 py-2 text-base border rounded-md focus:outline-none focus:ring-2 focus:ring-[#DCE6B5]"

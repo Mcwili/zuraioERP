@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { costTypeToI18nKey } from "@/lib/expense-cost-types";
 
 interface BudgetActualCost {
   id: string;
@@ -17,12 +18,6 @@ interface OrderActualCostsTabProps {
   orderId: string;
   currency: string;
 }
-
-const costTypeKeys: Record<string, string> = {
-  PERSONNEL: "costTypePersonnel",
-  EXTERNAL: "costTypeExternal",
-  INFRASTRUCTURE: "costTypeInfrastructure",
-};
 
 export function OrderActualCostsTab({
   actualCosts,
@@ -89,7 +84,7 @@ export function OrderActualCostsTab({
               >
                 <td className="px-3 py-2">{formatDate(c.date)}</td>
                 <td className="px-3 py-2">
-                  {t(costTypeKeys[c.costType] || c.costType)}
+                  {t(costTypeToI18nKey[c.costType] ?? c.costType)}
                 </td>
                 <td className="px-3 py-2 text-right tabular-nums">
                   {formatAmount(c.amount)}

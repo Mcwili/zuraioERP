@@ -24,7 +24,9 @@ export default getRequestConfig(async () => {
     orders: (await import(`../../locales/${locale}/orders.json`)).default,
     billing: (await import(`../../locales/${locale}/billing.json`)).default,
     products: (await import(`../../locales/${locale}/products.json`)).default,
+    expenses: (await import(`../../locales/${locale}/expenses.json`)).default,
     errors: (await import(`../../locales/${locale}/errors.json`)).default,
+    reporting: (await import(`../../locales/${locale}/reporting.json`)).default,
   };
 
   return {

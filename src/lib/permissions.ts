@@ -21,6 +21,10 @@ export function canAccessBilling(role: Role): boolean {
   return ["ADMIN", "FINANCE", "MANAGEMENT"].includes(role);
 }
 
+export function canAccessExpenses(role: Role): boolean {
+  return ["ADMIN", "FINANCE", "MANAGEMENT", "PROJECT_LEAD", "DELIVERY"].includes(role);
+}
+
 export function canAccessProducts(role: Role): boolean {
   return ["ADMIN", "SALES", "PROJECT_LEAD", "FINANCE", "DELIVERY", "MANAGEMENT"].includes(
     role
@@ -29,6 +33,10 @@ export function canAccessProducts(role: Role): boolean {
 
 export function canAccessAlerts(role: Role): boolean {
   return true; // Alle Rollen
+}
+
+export function canAccessReporting(role: Role): boolean {
+  return ["ADMIN", "FINANCE", "MANAGEMENT"].includes(role);
 }
 
 export function canManageUsers(role: Role): boolean {

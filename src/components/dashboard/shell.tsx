@@ -46,7 +46,6 @@ export function DashboardShell({
           className={`md:hidden fixed inset-0 z-30 bg-black/40 transition-opacity duration-300 ${
             sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
-          onClick={() => setSidebarOpen(false)}
           aria-hidden="true"
         />
 

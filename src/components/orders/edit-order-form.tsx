@@ -6,7 +6,7 @@ import { updateOrderFromForm, deleteOrder } from "@/server/actions/orders";
 import { useRouter } from "next/navigation";
 import { Pencil, Calendar, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { formatDateCH, parseDateCH } from "@/lib/date-format";
+import { formatDateCHDot, parseDateCH } from "@/lib/date-format";
 import { CalendarPopover } from "@/components/ui/calendar-popover";
 import type { Order, Organization, User, Contact } from "@prisma/client";
 
@@ -42,7 +42,7 @@ export function EditOrderForm({ order, users, contacts }: EditOrderFormProps) {
 
   useEffect(() => {
     if (open) {
-      setEndDateStr(order.endDate ? formatDateCH(new Date(order.endDate)) : "");
+      setEndDateStr(order.endDate ? formatDateCHDot(new Date(order.endDate)) : "");
       setCalendarOpen(false);
       setViewMonth(order.endDate ? new Date(order.endDate) : new Date());
     }
@@ -105,7 +105,6 @@ export function EditOrderForm({ order, users, contacts }: EditOrderFormProps) {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
           style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
-          onClick={() => setOpen(false)}
         >
           <div
             className="w-full max-w-lg rounded-lg shadow-xl overflow-hidden my-8"
@@ -207,7 +206,7 @@ export function EditOrderForm({ order, users, contacts }: EditOrderFormProps) {
                         onViewMonthChange={setViewMonth}
                         selectedDate={parseDateCH(endDateStr)}
                         onSelect={(d) => {
-                          setEndDateStr(formatDateCH(d));
+                          setEndDateStr(formatDateCHDot(d));
                           setCalendarOpen(false);
                         }}
                         months={MONTHS}
@@ -318,7 +317,6 @@ export function EditOrderForm({ order, users, contacts }: EditOrderFormProps) {
               <div
                 className="fixed inset-0 z-[60] flex items-center justify-center p-4"
                 style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
-                onClick={() => setDeleteOpen(false)}
               >
                 <div
                   className="w-full max-w-md rounded-lg shadow-xl overflow-hidden"

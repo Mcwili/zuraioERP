@@ -9,7 +9,7 @@ import {
   updateMilestoneAction,
   deleteMilestone,
 } from "@/server/actions/milestones";
-import { formatDateCH, parseDateCH } from "@/lib/date-format";
+import { formatDateCHDot, parseDateCH } from "@/lib/date-format";
 import { CalendarPopover } from "@/components/ui/calendar-popover";
 
 interface Milestone {
@@ -31,85 +31,107 @@ export function OrderMilestonesSection({ milestones, orderId }: OrderMilestonesS
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const formatDate = (d: Date | string | null) =>
-    d ? (typeof d === "string" ? new Date(d).toLocaleDateString("de-CH") : formatDateCH(d)) : "–";
+    d ? (typeof d === "string" ? formatDateCHDot(new Date(d)) : formatDateCHDot(d)) : "–";
 
   return (
-    <div className="p-4 border-t" style={{ borderColor: "#e1dfdd" }}>
-      <div className="flex justify-between items-center mb-3">
+    <div
+      className="rounded-lg border overflow-hidden bg-white"
+      style={{ borderColor: "#e1dfdd" }}
+    >
+      <div className="flex justify-between items-center p-3 border-b" style={{ borderColor: "#e1dfdd" }}>
         <h3 className="font-semibold text-zuraio-text">{t("milestones")}</h3>
-        <button
-          type="button"
-          onClick={() => {
-            setShowForm(true);
-            setEditingId(null);
-          }}
-          className="flex items-center gap-1.5 px-2 py-1.5 text-sm rounded transition-colors hover:bg-[#DCE6B5]"
-          style={{ color: "#9FAF52" }}
-        >
-          <Plus className="h-4 w-4" />
-          {t("addMilestone")}
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setShowForm(true);
+              setEditingId(null);
+            }}
+            className="flex items-center gap-1.5 px-2 py-1.5 text-sm rounded transition-colors hover:bg-[#DCE6B5]"
+            style={{ color: "#9FAF52" }}
+          >
+            <Plus className="h-4 w-4" />
+            {t("addMilestone")}
+          </button>
+        </div>
       </div>
 
       {showForm && !editingId && (
-        <MilestoneForm
-          orderId={orderId}
-          onSuccess={() => setShowForm(false)}
-          onCancel={() => setShowForm(false)}
-        />
+        <div className="p-4 border-b" style={{ borderColor: "#e1dfdd" }}>
+          <MilestoneForm
+            orderId={orderId}
+            onSuccess={() => setShowForm(false)}
+            onCancel={() => setShowForm(false)}
+          />
+        </div>
       )}
 
       {milestones.length === 0 && !showForm ? (
-        <p className="text-zuraio-textMuted text-sm">{t("noMilestones")}</p>
+        <div className="p-6 text-center text-zuraio-textMuted text-sm">
+          {t("noMilestones")}
+        </div>
       ) : (
-        <ul className="space-y-2">
-          {milestones.map((m) => (
-            <li
-              key={m.id}
-              className="p-3 border rounded"
-              style={{ borderColor: "#e1dfdd" }}
-            >
-              {editingId === m.id ? (
-                <MilestoneForm
-                  orderId={orderId}
-                  milestone={m}
-                  onSuccess={() => setEditingId(null)}
-                  onCancel={() => setEditingId(null)}
-                />
-              ) : (
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0 flex-1">
-                    <div className="font-medium text-zuraio-text">{m.name}</div>
-                    {m.description && (
-                      <p className="mt-1 text-sm text-zuraio-textMuted">{m.description}</p>
-                    )}
-                    <div className="mt-1 text-xs text-zuraio-textMuted">
-                      {t("milestoneDueDate")}: {formatDate(m.dueDate)}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => setEditingId(m.id)}
-                      className="p-1.5 rounded hover:bg-[#DCE6B5]"
-                      style={{ color: "#9FAF52" }}
-                      title={t("editMilestone")}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </button>
-                    <DeleteMilestoneButton
-                      milestoneName={m.name}
-                      onDelete={async () => {
-                        await deleteMilestone(m.id, orderId);
-                        if (editingId === m.id) setEditingId(null);
-                      }}
+        <table className="w-full text-sm">
+          <thead style={{ backgroundColor: "#f8f8f7", borderBottom: "1px solid #e1dfdd" }}>
+            <tr>
+              <th className="text-left px-3 py-2 text-xs font-medium text-zuraio-textMuted">
+                {t("milestoneTitle")}
+              </th>
+              <th className="text-left px-3 py-2 text-xs font-medium text-zuraio-textMuted">
+                {t("milestoneDescription")}
+              </th>
+              <th className="text-left px-3 py-2 text-xs font-medium text-zuraio-textMuted">
+                {t("milestoneDueDate")}
+              </th>
+              <th className="w-10 px-3 py-2"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {milestones.map((m) => (
+              <tr
+                key={m.id}
+                className="border-t transition-colors hover:bg-[#DCE6B5]"
+                style={{ borderColor: "#e1dfdd" }}
+              >
+                {editingId === m.id ? (
+                  <td colSpan={4} className="p-4" style={{ borderColor: "#e1dfdd" }}>
+                    <MilestoneForm
+                      orderId={orderId}
+                      milestone={m}
+                      onSuccess={() => setEditingId(null)}
+                      onCancel={() => setEditingId(null)}
                     />
-                  </div>
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
+                  </td>
+                ) : (
+                  <>
+                    <td className="px-3 py-2 font-medium text-zuraio-text">{m.name}</td>
+                    <td className="px-3 py-2 text-zuraio-textMuted">{m.description || "–"}</td>
+                    <td className="px-3 py-2 text-zuraio-textMuted">{formatDate(m.dueDate)}</td>
+                    <td className="px-3 py-2">
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => setEditingId(m.id)}
+                          className="p-2 rounded-md transition-colors hover:bg-[#DCE6B5]"
+                          title={t("editMilestone")}
+                        >
+                          <Pencil className="h-4 w-4" style={{ color: "#9FAF52" }} />
+                        </button>
+                        <DeleteMilestoneButton
+                          milestoneName={m.name}
+                          onDelete={async () => {
+                            await deleteMilestone(m.id, orderId);
+                            if (editingId === m.id) setEditingId(null);
+                          }}
+                        />
+                      </div>
+                    </td>
+                  </>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );
@@ -146,7 +168,7 @@ function MilestoneForm({
 
   const [dueDateStr, setDueDateStr] = useState(
     milestone?.dueDate
-      ? formatDateCH(
+      ? formatDateCHDot(
           typeof milestone.dueDate === "string"
             ? new Date(milestone.dueDate)
             : milestone.dueDate
@@ -239,7 +261,7 @@ function MilestoneForm({
             ref={inputRef}
             name="dueDate"
             type="text"
-            placeholder="DD.MM.YYYY"
+            placeholder="dd.mm.yyyy"
             value={dueDateStr}
             readOnly
             onClick={() => setCalendarOpen((o) => !o)}
@@ -263,7 +285,7 @@ function MilestoneForm({
                 onViewMonthChange={setViewMonth}
                 selectedDate={parseDateCH(dueDateStr)}
                 onSelect={(d) => {
-                  setDueDateStr(formatDateCH(d));
+                  setDueDateStr(formatDateCHDot(d));
                   setCalendarOpen(false);
                 }}
                 months={MONTHS}

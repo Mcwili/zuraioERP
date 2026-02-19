@@ -58,14 +58,24 @@ export function getGraphClient(): Client {
   });
 }
 
+export type DocumentTypeParam =
+  | "CONTRACT"
+  | "NDA"
+  | "OFFER"
+  | "ORDER"
+  | "CORRESPONDENCE"
+  | "TASK_ATTACHMENT"
+  | "EXPENSE_RECEIPT";
+
 export async function uploadDocument(
   organizationId: string,
   orderId: string | null,
-  documentType: "CONTRACT" | "NDA" | "OFFER" | "ORDER" | "CORRESPONDENCE" | "TASK_ATTACHMENT",
+  documentType: DocumentTypeParam,
   fileName: string,
   fileContent: Buffer,
   mimeType: string,
-  taskId?: string | null
+  taskId?: string | null,
+  expenseActualCostId?: string | null
 ): Promise<{ driveId: string; itemId: string; webUrl?: string }> {
   const driveId = process.env.SHAREPOINT_DRIVE_ID;
   const siteId = process.env.SHAREPOINT_SITE_ID;
@@ -78,23 +88,29 @@ export async function uploadDocument(
 
   const client = getGraphClient();
 
-  const folderPath = orderId
-    ? documentType === "TASK_ATTACHMENT" && taskId
-      ? `Auftraege/${orderId}/Aufgaben/${taskId}`
-      : `Auftraege/${orderId}/${
-          documentType === "OFFER"
-            ? "Offerten"
-            : documentType === "ORDER"
-            ? "Bestellungen"
-            : "Sonstiges"
-        }`
-    : `Organisationen/${organizationId}/${
-        documentType === "CONTRACT"
-          ? "Vertraege"
-          : documentType === "NDA"
-          ? "NDAs"
-          : "Korrespondenz"
-      }`;
+  let folderPath: string;
+  if (documentType === "EXPENSE_RECEIPT" && expenseActualCostId) {
+    folderPath = `Ausgaben/${organizationId}/${expenseActualCostId}`;
+  } else if (orderId) {
+    folderPath =
+      documentType === "TASK_ATTACHMENT" && taskId
+        ? `Auftraege/${orderId}/Aufgaben/${taskId}`
+        : `Auftraege/${orderId}/${
+            documentType === "OFFER"
+              ? "Offerten"
+              : documentType === "ORDER"
+              ? "Bestellungen"
+              : "Sonstiges"
+          }`;
+  } else {
+    folderPath = `Organisationen/${organizationId}/${
+      documentType === "CONTRACT"
+        ? "Vertraege"
+        : documentType === "NDA"
+        ? "NDAs"
+        : "Korrespondenz"
+    }`;
+  }
 
   let targetDriveId = driveId;
   if (!targetDriveId && siteId) {

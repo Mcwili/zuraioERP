@@ -106,7 +106,7 @@ export function Sidebar({ onClose, closeOnLinkClick }: SidebarProps) {
 
       {/* Version Info – wie alt, foreground-muted = #605e5c */}
       <div
-        className="px-4 py-3 text-xs text-center"
+        className="px-4 py-3 text-xs text-left"
         style={{
           borderTop: "1px solid rgba(0, 0, 0, 0.06)",
           color: "var(--foreground-muted)",

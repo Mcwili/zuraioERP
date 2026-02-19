@@ -7,7 +7,7 @@ import { Calendar } from "lucide-react";
 import { createOrderTask, updateOrderTask } from "@/server/actions/order-tasks";
 import { uploadOrderTaskDocument } from "@/server/actions/documents";
 import { useRouter } from "next/navigation";
-import { parseDateCH, formatDateCH } from "@/lib/date-format";
+import { parseDateCH, formatDateCHDot } from "@/lib/date-format";
 import { CalendarPopover } from "@/components/ui/calendar-popover";
 
 interface OrderTaskForEdit {
@@ -38,7 +38,7 @@ export function AddTaskModal({ orderId, organizationId, task, onClose }: AddTask
   const [error, setError] = useState("");
   const [dueDateStr, setDueDateStr] = useState(
     task?.dueDate
-      ? formatDateCH(typeof task.dueDate === "string" ? new Date(task.dueDate) : task.dueDate)
+      ? formatDateCHDot(typeof task.dueDate === "string" ? new Date(task.dueDate) : task.dueDate)
       : ""
   );
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -132,7 +132,6 @@ export function AddTaskModal({ orderId, organizationId, task, onClose }: AddTask
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
-      onClick={onClose}
     >
       <div
         className="w-full max-w-md rounded-lg shadow-xl overflow-hidden bg-white"
@@ -181,7 +180,7 @@ export function AddTaskModal({ orderId, organizationId, task, onClose }: AddTask
                 ref={inputRef}
                 name="dueDate"
                 type="text"
-                placeholder="DD.MM.YYYY"
+                placeholder="dd.mm.yyyy"
                 value={dueDateStr}
                 readOnly
                 onClick={() => setCalendarOpen((o) => !o)}
@@ -205,7 +204,7 @@ export function AddTaskModal({ orderId, organizationId, task, onClose }: AddTask
                     onViewMonthChange={setViewMonth}
                     selectedDate={parseDateCH(dueDateStr)}
                     onSelect={(d) => {
-                      setDueDateStr(formatDateCH(d));
+                      setDueDateStr(formatDateCHDot(d));
                       setCalendarOpen(false);
                     }}
                     months={MONTHS}

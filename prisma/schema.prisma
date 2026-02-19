@@ -106,6 +106,29 @@ enum DocumentType {
   ORDER
   CORRESPONDENCE
   TASK_ATTACHMENT
+  EXPENSE_RECEIPT
+}
+
+enum PlannedExpenseStatus {
+  PLANNED
+  IN_PROGRESS
+  PAID
+}
+
+enum ExpenseCostType {
+  LOHN
+  SPESEN
+  AUS_WEITERBILDUNG
+  SONSTIGES
+  BUCHFUEHRUNG
+  FAHRZEUG
+  INFORMATIK
+  UNTERHALT_REPARATUR_ERSATZ
+  VERWALTUNG
+  WERBUNG_AKQUISITION
+  PERSONNEL
+  EXTERNAL
+  INFRASTRUCTURE
 }
 
 model Organization {
@@ -127,6 +150,8 @@ model Organization {
   addresses            Address[]
   documents            Document[]
   orders               Order[]
+  plannedExpenses      PlannedExpense[]
+  expenseActualCosts   ExpenseActualCost[]
 
   @@index([type])
   @@index([parentOrganizationId])
@@ -176,28 +201,31 @@ model Address {
 }
 
 model Document {
-  id                  String       @id @default(cuid())
-  organizationId      String       @map("organization_id")
-  orderId             String?      @map("order_id")
-  orderTaskId         String?      @map("order_task_id")
-  type                DocumentType
-  fileName            String       @map("file_name")
-  sharePointDriveId   String?      @map("share_point_drive_id")
-  sharePointItemId    String?      @map("share_point_item_id")
-  sharePointWebUrl    String?      @map("share_point_web_url")
-  mimeType            String?      @map("mime_type")
-  size                Int?         @default(0)
-  uploadedAt          DateTime     @default(now()) @map("uploaded_at")
-  uploadedById        String?      @map("uploaded_by_id")
+  id                    String       @id @default(cuid())
+  organizationId        String       @map("organization_id")
+  orderId               String?      @map("order_id")
+  orderTaskId           String?      @map("order_task_id")
+  expenseActualCostId   String?      @map("expense_actual_cost_id")
+  type                  DocumentType
+  fileName              String       @map("file_name")
+  sharePointDriveId     String?      @map("share_point_drive_id")
+  sharePointItemId      String?      @map("share_point_item_id")
+  sharePointWebUrl      String?      @map("share_point_web_url")
+  mimeType              String?      @map("mime_type")
+  size                  Int?         @default(0)
+  uploadedAt            DateTime     @default(now()) @map("uploaded_at")
+  uploadedById          String?      @map("uploaded_by_id")
 
-  organization        Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  order               Order?      @relation(fields: [orderId], references: [id], onDelete: SetNull)
-  orderTask           OrderTask?   @relation(fields: [orderTaskId], references: [id], onDelete: SetNull)
-  uploadedBy          User?        @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  organization          Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  order                 Order?           @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  orderTask             OrderTask?      @relation(fields: [orderTaskId], references: [id], onDelete: SetNull)
+  expenseActualCost     ExpenseActualCost? @relation(fields: [expenseActualCostId], references: [id], onDelete: Cascade)
+  uploadedBy            User?            @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
 
   @@index([organizationId])
   @@index([orderId])
   @@index([orderTaskId])
+  @@index([expenseActualCostId])
   @@map("documents")
 }
 
@@ -307,9 +335,11 @@ model Order {
   billingPlan    BillingPlan?
   budgetPlans    BudgetPlan[]
   actualCosts    BudgetActualCost[]
-  tasks          OrderTask[]
-  invoices       Invoice[]
-  documents      Document[]
+  tasks               OrderTask[]
+  invoices            Invoice[]
+  documents           Document[]
+  plannedExpenses     PlannedExpense[]
+  expenseActualCosts  ExpenseActualCost[]
 
   @@index([organizationId])
   @@index([status])
@@ -431,6 +461,59 @@ model BudgetActualCost {
   @@index([orderId])
   @@index([assignedMonth])
   @@map("budget_actual_costs")
+}
+
+// --- Ausgaben (geplant + effektiv) ---
+
+model PlannedExpense {
+  id              String              @id @default(cuid())
+  organizationId  String?             @map("organization_id")
+  orderId         String?             @map("order_id")
+  description     String              @db.Text
+  estimatedAmount Decimal             @map("estimated_amount") @db.Decimal(12, 2)
+  currency        String              @default("CHF")
+  plannedDate     DateTime?           @map("planned_date")
+  costType        ExpenseCostType     @map("cost_type")
+  status          PlannedExpenseStatus @default(PLANNED)
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  organization    Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  order           Order?      @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  actualCosts     ExpenseActualCost[]
+
+  @@index([organizationId])
+  @@index([orderId])
+  @@index([status])
+  @@index([plannedDate])
+  @@map("planned_expenses")
+}
+
+model ExpenseActualCost {
+  id                String    @id @default(cuid())
+  organizationId    String?   @map("organization_id")
+  orderId           String?   @map("order_id")
+  plannedExpenseId  String?   @map("planned_expense_id")
+  description       String?   @db.Text
+  amount            Decimal   @db.Decimal(12, 2)
+  vatAmount         Decimal?  @default(0) @map("vat_amount") @db.Decimal(12, 2)
+  currency          String    @default("CHF")
+  paidAt            DateTime  @map("paid_at")
+  supplier          String?
+  assignedMonth    String?   @map("assigned_month")
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  organization      Organization?     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  order             Order?           @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  plannedExpense    PlannedExpense?  @relation(fields: [plannedExpenseId], references: [id], onDelete: SetNull)
+  documents         Document[]
+
+  @@index([organizationId])
+  @@index([orderId])
+  @@index([plannedExpenseId])
+  @@index([paidAt])
+  @@index([assignedMonth])
+  @@map("expense_actual_costs")
 }
 
 // --- Abrechnung ---

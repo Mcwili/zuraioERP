@@ -114,15 +114,10 @@ export function OrderDetailTabs({ order }: OrderDetailTabsProps) {
       </div>
 
       {activeTab === "milestones" && (
-        <div
-          className="rounded-lg border overflow-hidden bg-white space-y-4"
-          style={{ borderColor: "#e1dfdd" }}
-        >
-          <OrderMilestonesSection
-            milestones={order.milestones}
-            orderId={order.id}
-          />
-        </div>
+        <OrderMilestonesSection
+          milestones={order.milestones}
+          orderId={order.id}
+        />
       )}
       {activeTab === "calendar" && (
         <div

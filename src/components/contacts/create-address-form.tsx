@@ -40,7 +40,6 @@ export function CreateAddressForm({ organizationId }: { organizationId: string }
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
-          onClick={() => setOpen(false)}
         >
           <div
             className="w-full max-w-md rounded-lg shadow-xl overflow-hidden"
