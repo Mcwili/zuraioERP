@@ -30,12 +30,24 @@ function LoginForm() {
     setError("");
     setLoading(true);
 
+    // #region agent log
+    const _p1 = { sessionId: "faa0f8", location: "login/page.tsx", message: "login: before signIn", data: { callbackUrl }, timestamp: Date.now(), hypothesisId: "D1" };
+    console.log("[DEBUG][faa0f8]", JSON.stringify(_p1));
+    fetch("http://127.0.0.1:7618/ingest/a69c7205-1643-4ebf-93f3-fc833731c99f", { method: "POST", headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "faa0f8" }, body: JSON.stringify(_p1) }).catch(() => {});
+    // #endregion
+
     const result = await signIn("credentials", {
       email,
       password,
       redirect: true,
       callbackUrl,
     });
+
+    // #region agent log
+    const _p2 = { sessionId: "faa0f8", location: "login/page.tsx", message: "login: after signIn", data: { hasError: !!result?.error, error: result?.error ?? null }, timestamp: Date.now(), hypothesisId: "D1" };
+    console.log("[DEBUG][faa0f8]", JSON.stringify(_p2));
+    fetch("http://127.0.0.1:7618/ingest/a69c7205-1643-4ebf-93f3-fc833731c99f", { method: "POST", headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "faa0f8" }, body: JSON.stringify(_p2) }).catch(() => {});
+    // #endregion
 
     setLoading(false);
 
