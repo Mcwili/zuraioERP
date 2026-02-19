@@ -33,19 +33,16 @@ function LoginForm() {
     const result = await signIn("credentials", {
       email,
       password,
-      redirect: false,
+      redirect: true,
+      callbackUrl,
     });
 
     setLoading(false);
 
+    // Nur bei Fehler erreicht – bei Erfolg leitet NextAuth automatisch weiter
     if (result?.error) {
       setError(t("loginError"));
-      return;
     }
-
-    // Session-Refresh vor Redirect (behebt doppeltes Login bei redirect: false)
-    await fetch("/api/auth/session", { method: "GET", cache: "no-store" });
-    window.location.href = callbackUrl;
   }
 
   return (

@@ -10,7 +10,7 @@ interface Document {
   id: string;
   type: string;
   fileName: string;
-  uploadedAt: Date;
+  uploadedAt: Date | string;
 }
 
 interface OrderDocumentsTabProps {
@@ -42,7 +42,7 @@ export function OrderDocumentsTab({
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
 
-  const formatDate = (d: Date) => d.toLocaleDateString("de-CH");
+  const formatDate = (d: Date | string) => new Date(d).toLocaleDateString("de-CH");
 
   async function handleUpload(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

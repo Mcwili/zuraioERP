@@ -7,7 +7,7 @@ interface InvoiceWithItems {
   id: string;
   number: string;
   status: string;
-  dueDate: Date;
+  dueDate: Date | string;
   items: { quantity: unknown; unitPrice: unknown }[];
   payments: { amount: unknown }[];
 }
@@ -25,7 +25,7 @@ export function OrderInvoicesTab({
 }: OrderInvoicesTabProps) {
   const t = useTranslations("orders");
 
-  const formatDate = (d: Date) => d.toLocaleDateString("de-CH");
+  const formatDate = (d: Date | string) => new Date(d).toLocaleDateString("de-CH");
 
   const getTotal = (inv: InvoiceWithItems) => {
     const itemsTotal = inv.items.reduce(

@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { serializeForRSC } from "@/lib/serialize-order";
 import { getTranslations } from "next-intl/server";
 import { Settings } from "lucide-react";
 import { PageBanner } from "@/components/dashboard/page-banner";
@@ -29,7 +30,8 @@ export default async function SettingsPage() {
   try {
     profile = await getCurrentUserProfile();
     if (isAdmin) {
-      users = await getUsers();
+      const usersRaw = await getUsers();
+      users = serializeForRSC(usersRaw) as typeof users;
       try {
         sharePointStatus = await getSharePointStatus();
       } catch (spErr) {

@@ -9,7 +9,7 @@ interface AuditLogEntry {
   entityId: string | null;
   oldValues: unknown;
   newValues: unknown;
-  createdAt: Date;
+  createdAt: Date | string;
   user?: { name: string | null; email: string } | null;
 }
 
@@ -21,8 +21,8 @@ interface OrderHistoryTabProps {
 export function OrderHistoryTab({ auditLogs, orderId }: OrderHistoryTabProps) {
   const t = useTranslations("orders");
 
-  const formatDate = (d: Date) =>
-    d.toLocaleString("de-CH", {
+  const formatDate = (d: Date | string) =>
+    new Date(d).toLocaleString("de-CH", {
       dateStyle: "short",
       timeStyle: "short",
     });

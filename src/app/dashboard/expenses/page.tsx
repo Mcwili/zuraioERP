@@ -7,7 +7,7 @@ import { Wallet } from "lucide-react";
 import { PageBanner } from "@/components/dashboard/page-banner";
 import { ExpensesContent } from "@/components/expenses/expenses-content";
 import { getExpensesData, getExpensesChartData } from "@/server/actions/expenses";
-import { serializeOrder } from "@/lib/serialize-order";
+import { serializeOrder, serializeForRSC } from "@/lib/serialize-order";
 import type { PlannedExpenseStatus, ExpenseCostType } from "@prisma/client";
 
 export default async function ExpensesPage({
@@ -57,6 +57,7 @@ export default async function ExpensesPage({
   const actualCosts = data.actualCosts.map((a) =>
     serializeOrder(a as Record<string, unknown>)
   );
+  const serializedChartData = serializeForRSC(chartData);
 
   return (
     <div className="flex flex-col min-h-0">
@@ -69,7 +70,7 @@ export default async function ExpensesPage({
           organizations={data.organizations}
           orders={data.orders}
           filters={params}
-          chartData={chartData}
+          chartData={serializedChartData as Parameters<typeof ExpensesContent>[0]["chartData"]}
         />
         </Suspense>
       </div>

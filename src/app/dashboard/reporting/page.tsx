@@ -12,6 +12,7 @@ import { CashflowReport } from "@/components/reporting/cashflow-report";
 import { RevenueOverviewReport } from "@/components/reporting/revenue-overview-report";
 import { OpenItemsReport } from "@/components/reporting/open-items-report";
 import { BudgetVsActualReport } from "@/components/reporting/budget-vs-actual-report";
+import { serializeForRSC } from "@/lib/serialize-order";
 import {
   getIncomeStatementData,
   getBalanceSheetData,
@@ -80,7 +81,7 @@ export default async function ReportingPage({
     dateTo,
   };
 
-  const [reportData, filtersData] = await Promise.all([
+  const [reportDataRaw, filtersData] = await Promise.all([
     (async () => {
       switch (report) {
         case "income-statement":
@@ -101,6 +102,8 @@ export default async function ReportingPage({
     })(),
     getReportingFiltersData(),
   ]);
+
+  const reportData = serializeForRSC(reportDataRaw);
 
   let ReportContent: React.ReactNode;
   switch (report) {

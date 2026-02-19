@@ -5,7 +5,7 @@ import { costTypeToI18nKey } from "@/lib/expense-cost-types";
 
 interface BudgetActualCost {
   id: string;
-  date: Date;
+  date: Date | string;
   costType: string;
   amount: unknown;
   supplier: string | null;
@@ -26,7 +26,7 @@ export function OrderActualCostsTab({
 }: OrderActualCostsTabProps) {
   const t = useTranslations("orders");
 
-  const formatDate = (d: Date) => d.toLocaleDateString("de-CH");
+  const formatDate = (d: Date | string) => new Date(d).toLocaleDateString("de-CH");
   const formatAmount = (val: unknown) =>
     `${Number(val || 0).toLocaleString("de-CH")} ${currency}`;
 

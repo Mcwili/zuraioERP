@@ -26,7 +26,7 @@ const contractTypeKeys: Record<string, string> = {
 export function OrderHeader({ order }: OrderHeaderProps) {
   const t = useTranslations("orders");
 
-  const formatDate = (d: Date) => d.toLocaleDateString("de-CH");
+  const formatDate = (d: Date | string) => new Date(d).toLocaleDateString("de-CH");
   const formatCurrency = (val: number | null | undefined) =>
     val != null ? `${Number(val).toLocaleString("de-CH")} ${order.currency || "CHF"}` : "–";
 
