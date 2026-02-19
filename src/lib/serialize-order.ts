@@ -1,9 +1,9 @@
 /**
- * Konvertiert Prisma-Order-Objekt in ein serialisierbares Format für Client Components.
+ * Konvertiert Prisma-Objekte in ein serialisierbares Format für Client Components.
  * Prisma Decimal-Objekte werden zu number konvertiert, da sie sonst einen 500-Fehler verursachen.
  */
 
-function toSerializable(value: unknown): unknown {
+export function toSerializable(value: unknown): unknown {
   if (value === null || value === undefined) return value;
   if (typeof value === "number" || typeof value === "string" || typeof value === "boolean") return value;
   if (value instanceof Date) return value;
@@ -28,4 +28,9 @@ export type SerializedOrder = ReturnType<typeof serializeOrder>;
 
 export function serializeOrder<T extends Record<string, unknown>>(order: T): T {
   return toSerializable(order) as T;
+}
+
+/** Serialisiert beliebige Daten für RSC→Client (Decimal, etc.). */
+export function serializeForRSC<T>(data: T): T {
+  return toSerializable(data) as T;
 }

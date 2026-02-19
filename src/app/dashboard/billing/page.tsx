@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
+import { serializeForRSC } from "@/lib/serialize-order";
 import { authOptions } from "@/lib/auth";
 import { canAccessBilling } from "@/lib/permissions";
 import { getTranslations } from "next-intl/server";
@@ -24,12 +25,14 @@ export default async function BillingPage() {
     (i) => i.status !== "PAID" && new Date(i.dueDate) < new Date()
   );
 
-  const invoiceRows = invoices.map((i) => ({
-    id: i.id,
-    number: i.number,
-    status: i.status,
-    dueDate: i.dueDate,
-  }));
+  const invoiceRows = serializeForRSC(
+    invoices.map((i) => ({
+      id: i.id,
+      number: i.number,
+      status: i.status,
+      dueDate: i.dueDate,
+    }))
+  );
 
   return (
     <div className="flex flex-col min-h-0">

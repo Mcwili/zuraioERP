@@ -4,10 +4,12 @@ import { getTranslations } from "next-intl/server";
 import { Plus, Users } from "lucide-react";
 import { PageBanner } from "@/components/dashboard/page-banner";
 import { ContactsTable } from "@/components/contacts/contacts-table";
+import { serializeForRSC } from "@/lib/serialize-order";
 
 export default async function ContactsPage() {
   const t = await getTranslations("contacts");
   const organizations = await listOrganizations();
+  const serialized = serializeForRSC(organizations);
 
   return (
     <div className="flex flex-col min-h-0">
@@ -30,7 +32,7 @@ export default async function ContactsPage() {
         }
       />
       <div className="px-4 sm:px-6 md:px-8 pt-6 pb-8">
-        <ContactsTable organizations={organizations} />
+        <ContactsTable organizations={serialized} />
       </div>
     </div>
   );

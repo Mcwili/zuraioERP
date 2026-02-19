@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
+import { serializeForRSC } from "@/lib/serialize-order";
 import { authOptions } from "@/lib/auth";
 import { canAccessOrders } from "@/lib/permissions";
 import Link from "next/link";
@@ -23,7 +24,7 @@ export default async function OrdersPage() {
     orderBy: { createdAt: "desc" },
   });
 
-  const orders = rows.map((o) => ({
+  const ordersRaw = rows.map((o) => ({
     id: o.id,
     orderNumber: o.orderNumber,
     projectName: o.projectName,
@@ -33,6 +34,7 @@ export default async function OrdersPage() {
     organization: o.organization,
     milestones: o.milestones,
   }));
+  const orders = serializeForRSC(ordersRaw);
 
   return (
     <div className="flex flex-col min-h-0">

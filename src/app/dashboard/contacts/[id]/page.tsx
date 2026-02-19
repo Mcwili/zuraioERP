@@ -1,6 +1,7 @@
 import { getOrganization } from "@/server/actions/organizations";
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import { serializeForRSC } from "@/lib/serialize-order";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { getServerSession } from "next-auth";
@@ -23,8 +24,9 @@ export default async function OrganizationDetailPage({
   const { id } = await params;
   const t = await getTranslations("contacts");
   const tOrders = await getTranslations("orders");
-  const org = await getOrganization(id);
-  if (!org) notFound();
+  const orgRaw = await getOrganization(id);
+  if (!orgRaw) notFound();
+  const org = serializeForRSC(orgRaw);
 
   const session = await getServerSession(authOptions);
   const showOrders = session?.user && canAccessOrders(session.user.role);
