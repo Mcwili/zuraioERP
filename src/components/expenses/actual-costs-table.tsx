@@ -85,8 +85,8 @@ export function ActualCostsTable({
           cmp = (a.vatAmount ?? 0) - (b.vatAmount ?? 0);
           break;
         case "paidAt": {
-          const da = a.paidAt instanceof Date ? a.paidAt.toISOString() : String(a.paidAt ?? "");
-          const db = b.paidAt instanceof Date ? b.paidAt.toISOString() : String(b.paidAt ?? "");
+          const da = a.paidAt ?? "";
+          const db = b.paidAt ?? "";
           cmp = da.localeCompare(db);
           break;
         }
