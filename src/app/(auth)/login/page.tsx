@@ -11,7 +11,8 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("auth");
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const params = searchParams ?? new URLSearchParams();
+  const callbackUrl = params.get("callbackUrl") || "/dashboard";
   // Dev-Vorausfüllung – wird bei Production-Build entfernt (NODE_ENV=production)
   const [email, setEmail] = useState(
     process.env.NODE_ENV === "development" ? "admin@zuraio.local" : ""

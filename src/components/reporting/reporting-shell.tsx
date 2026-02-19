@@ -39,22 +39,25 @@ export function ReportingShell({
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // useSearchParams() kann bei statischem Rendering null zurückgeben
+  const params = searchParams ?? new URLSearchParams();
+
   function setReport(report: ReportType) {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("report", report);
-    router.push(`/dashboard/reporting?${params.toString()}`);
+    const next = new URLSearchParams(params.toString());
+    next.set("report", report);
+    router.push(`/dashboard/reporting?${next.toString()}`);
   }
 
   function updateFilter(key: string, value: string | undefined) {
-    const params = new URLSearchParams(searchParams.toString());
-    if (value) params.set(key, value);
-    else params.delete(key);
-    router.push(`/dashboard/reporting?${params.toString()}`);
+    const next = new URLSearchParams(params.toString());
+    if (value) next.set(key, value);
+    else next.delete(key);
+    router.push(`/dashboard/reporting?${next.toString()}`);
   }
 
-  const year = searchParams.get("year") ?? new Date().getFullYear().toString();
-  const organizationId = searchParams.get("organizationId") ?? "";
-  const orderId = searchParams.get("orderId") ?? "";
+  const year = params.get("year") ?? new Date().getFullYear().toString();
+  const organizationId = params.get("organizationId") ?? "";
+  const orderId = params.get("orderId") ?? "";
 
   return (
     <div className="space-y-4">

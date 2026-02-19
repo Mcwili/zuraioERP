@@ -88,13 +88,16 @@ export function ExpensesContent({
   const [addPlannedOpen, setAddPlannedOpen] = useState(false);
   const [addActualOpen, setAddActualOpen] = useState(false);
 
+  // useSearchParams() kann bei statischem Rendering null zurückgeben
+  const params = searchParams ?? new URLSearchParams();
+
   function updateFilters(updates: Record<string, string | undefined>) {
-    const params = new URLSearchParams(searchParams.toString());
+    const next = new URLSearchParams(params.toString());
     for (const [k, v] of Object.entries(updates)) {
-      if (v) params.set(k, v);
-      else params.delete(k);
+      if (v) next.set(k, v);
+      else next.delete(k);
     }
-    router.push(`/dashboard/expenses?${params.toString()}`);
+    router.push(`/dashboard/expenses?${next.toString()}`);
   }
 
   function handleSearchSubmit(e: React.FormEvent) {
