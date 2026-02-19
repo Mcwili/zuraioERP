@@ -17,7 +17,8 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "railway:predeploy": "sh scripts/railway-predeploy.sh"
   },
   "dependencies": {
     "@azure/identity": "^4.13.0",
