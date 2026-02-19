@@ -8,6 +8,7 @@ import { PageBanner } from "@/components/dashboard/page-banner";
 import { FileText } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { generateOrderNumber } from "@/lib/order-number";
+import { serializeForRSC } from "@/lib/serialize-order";
 
 export default async function NewOrderPage() {
   const t = await getTranslations("orders");
@@ -16,10 +17,11 @@ export default async function NewOrderPage() {
     redirect("/dashboard");
   }
 
-  const organizations = await prisma.organization.findMany({
+  const organizationsRaw = await prisma.organization.findMany({
     where: { type: "CUSTOMER" },
     orderBy: { name: "asc" },
   });
+  const organizations = serializeForRSC(organizationsRaw);
 
   async function createOrder(formData: FormData) {
     "use server";

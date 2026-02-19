@@ -71,6 +71,12 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+    redirect({ url, baseUrl }) {
+      // Verhindert doppeltes Einloggen: callbackUrl muss zur App gehören
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      if (new URL(url).origin === baseUrl) return url;
+      return `${baseUrl}/dashboard`;
+    },
   },
   session: {
     strategy: "jwt",

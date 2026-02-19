@@ -1,7 +1,7 @@
 import { getRequestConfig } from "next-intl/server";
 import { cookies } from "next/headers";
+import { defaultLocale, locales } from "./config";
 
-const locales = ["de", "en", "pt-BR"] as const;
 export type Locale = (typeof locales)[number];
 
 export default getRequestConfig(async () => {
@@ -10,7 +10,7 @@ export default getRequestConfig(async () => {
   const locale =
     localeCookie && locales.includes(localeCookie as Locale)
       ? (localeCookie as Locale)
-      : "de";
+      : defaultLocale;
 
   const common = (await import(`../../locales/${locale}/common.json`)).default;
   const messages = {
@@ -31,6 +31,7 @@ export default getRequestConfig(async () => {
 
   return {
     locale,
+    defaultLocale,
     messages,
   };
 });

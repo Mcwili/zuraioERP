@@ -6,7 +6,7 @@ import { PageBanner } from "@/components/dashboard/page-banner";
 import { OrderDetailTabs } from "@/components/orders/order-detail-tabs";
 import { EditOrderForm } from "@/components/orders/edit-order-form";
 import { FileText } from "lucide-react";
-import { serializeOrder } from "@/lib/serialize-order";
+import { serializeOrder, serializeForRSC } from "@/lib/serialize-order";
 
 export default async function OrderDetailPage({
   params,
@@ -20,7 +20,7 @@ export default async function OrderDetailPage({
 
   const order = serializeOrder(orderRaw);
 
-  const [users, contacts] = await Promise.all([
+  const [usersRaw, contactsRaw] = await Promise.all([
     getUsersForAccountOwner(),
     prisma.contact.findMany({
       where: { organizationId: order.organizationId },
@@ -28,6 +28,8 @@ export default async function OrderDetailPage({
       orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
     }),
   ]);
+  const users = serializeForRSC(usersRaw);
+  const contacts = serializeForRSC(contactsRaw);
 
   const bannerTitle = order.orderNumber
     ? `Auftrag ${order.orderNumber} – ${order.organization.name}`

@@ -9,6 +9,7 @@ import { Receipt } from "lucide-react";
 import { PageBanner } from "@/components/dashboard/page-banner";
 import { InvoiceForm } from "@/components/billing/invoice-form";
 import { generateInvoiceNumber } from "@/lib/invoice-number";
+import { serializeForRSC } from "@/lib/serialize-order";
 
 export default async function NewInvoicePage() {
   const t = await getTranslations("billing");
@@ -34,7 +35,7 @@ export default async function NewInvoicePage() {
     take: 100,
   });
 
-  const ordersWithPlanItems = orders.map((o) => ({
+  const ordersWithPlanItemsRaw = orders.map((o) => ({
     id: o.id,
     orderNumber: o.orderNumber,
     projectName: o.projectName,
@@ -46,6 +47,7 @@ export default async function NewInvoicePage() {
       description: i.description,
     })),
   }));
+  const ordersWithPlanItems = serializeForRSC(ordersWithPlanItemsRaw);
 
   async function createInvoice(formData: FormData) {
     "use server";

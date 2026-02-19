@@ -1,5 +1,20 @@
 # Zuraio ERP – Railway Deployment
 
+## Env-Check vor Deployment
+
+Vor dem ersten Deploy diese Variablen prüfen:
+
+| Variable | Pflicht | Hinweis |
+|----------|---------|---------|
+| `DATABASE_URL` | Ja | Production-Datenbank-URL |
+| `NEXTAUTH_URL` | Ja | **Muss exakt** die Deployment-URL sein (z.B. `https://erp.zuraio.ch`). Kein Trailing-Slash. |
+| `NEXTAUTH_SECRET` | Ja | `openssl rand -base64 32` generieren |
+| `AUTH_TRUST_HOST` | Bei Proxy | `true` setzen, wenn hinter Reverse-Proxy (z.B. Vercel, Cloudflare) |
+
+**Häufige Fehler:**
+- `NEXTAUTH_URL` auf `http://localhost:3000` belassen → Login funktioniert nicht
+- `NEXTAUTH_URL` mit Trailing-Slash → Redirect-Probleme
+
 ## deploy-1: GitHub mit Railway verbinden
 
 1. [Railway](https://railway.app) öffnen und anmelden
@@ -11,8 +26,9 @@
 | Variable | Beschreibung |
 |----------|--------------|
 | `DATABASE_URL` | Wird von Railway PostgreSQL automatisch gesetzt (Referenz hinzufügen) |
-| `NEXTAUTH_URL` | https://your-app.railway.app (nach erstem Deploy die echte URL) |
+| `NEXTAUTH_URL` | Exakt die Production-URL (z.B. https://your-app.railway.app), ohne Trailing-Slash |
 | `NEXTAUTH_SECRET` | `openssl rand -base64 32` ausführen |
+| `AUTH_TRUST_HOST` | (Optional) `true` bei Reverse-Proxy |
 | `AZURE_CLIENT_ID` | (Optional) Azure AD App für SharePoint |
 | `AZURE_CLIENT_SECRET` | (Optional) |
 | `AZURE_TENANT_ID` | (Optional) |
