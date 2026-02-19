@@ -5,7 +5,9 @@ import { Settings } from "lucide-react";
 import { PageBanner } from "@/components/dashboard/page-banner";
 import { canManageUsers } from "@/lib/permissions";
 import { getUsers, getCurrentUserProfile } from "@/server/actions/users";
+import { getSharePointStatus } from "@/server/actions/sharepoint-settings";
 import { CreateUserForm } from "@/components/settings/create-user-form";
+import { SharePointSettingsForm } from "@/components/settings/sharepoint-settings-form";
 import { EditUserForm } from "@/components/settings/edit-user-form";
 import { DeleteUserButton } from "@/components/settings/delete-user-button";
 import { ChangePasswordForm } from "@/components/settings/change-password-form";
@@ -20,6 +22,7 @@ export default async function SettingsPage() {
 
   let profile: Awaited<ReturnType<typeof getCurrentUserProfile>> = null;
   let users: Awaited<ReturnType<typeof getUsers>> = [];
+  let sharePointStatus: Awaited<ReturnType<typeof getSharePointStatus>> | null = null;
 
   const isAdmin = canManageUsers(session.user.role);
 
@@ -27,6 +30,11 @@ export default async function SettingsPage() {
     profile = await getCurrentUserProfile();
     if (isAdmin) {
       users = await getUsers();
+      try {
+        sharePointStatus = await getSharePointStatus();
+      } catch (spErr) {
+        console.error("SharePoint status error:", spErr);
+      }
     }
   } catch (err) {
     console.error("Settings page error:", err);
@@ -134,6 +142,26 @@ export default async function SettingsPage() {
                 </tbody>
               </table>
             </div>
+          </section>
+        )}
+
+        {/* SharePoint – nur für Admin */}
+        {isAdmin && (
+          <section>
+            <h2 className="font-semibold text-zuraio-text mb-4">
+              {tSettings("sharePoint")}
+            </h2>
+            <SharePointSettingsForm
+              initialStatus={
+                sharePointStatus ?? {
+                  configured: false,
+                  hasSiteId: false,
+                  hasDriveId: false,
+                  siteId: null,
+                  driveId: null,
+                }
+              }
+            />
           </section>
         )}
       </div>

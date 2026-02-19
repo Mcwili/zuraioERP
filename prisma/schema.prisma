@@ -630,3 +630,11 @@ model DunningRun {
 
   @@map("dunning_runs")
 }
+
+model SystemSetting {
+  id    String  @id @default(cuid())
+  key   String  @unique
+  value String? @db.Text
+
+  @@map("system_settings")
+}

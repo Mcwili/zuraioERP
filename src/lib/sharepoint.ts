@@ -1,5 +1,6 @@
 import { Client } from "@microsoft/microsoft-graph-client";
 import { ClientSecretCredential } from "@azure/identity";
+import { prisma } from "@/lib/prisma";
 
 /**
  * SharePoint / Microsoft Graph API Client für Zuraio ERP
@@ -14,6 +15,9 @@ import { ClientSecretCredential } from "@azure/identity";
  * - AZURE_CLIENT_SECRET
  * - AZURE_TENANT_ID
  * - SHAREPOINT_SITE_ID oder SHAREPOINT_DRIVE_ID
+ *
+ * Optionale DB-Konfiguration (Einstellungen):
+ * - sharepoint_site_id, sharepoint_drive_id in SystemSetting
  */
 
 let cachedCredential: ClientSecretCredential | null = null;
@@ -67,6 +71,20 @@ export type DocumentTypeParam =
   | "TASK_ATTACHMENT"
   | "EXPENSE_RECEIPT";
 
+async function getSharePointSiteAndDrive(): Promise<{
+  siteId: string | null;
+  driveId: string | null;
+}> {
+  const [siteRow, driveRow] = await Promise.all([
+    prisma.systemSetting.findUnique({ where: { key: "sharepoint_site_id" } }),
+    prisma.systemSetting.findUnique({ where: { key: "sharepoint_drive_id" } }),
+  ]);
+  return {
+    siteId: siteRow?.value?.trim() || process.env.SHAREPOINT_SITE_ID || null,
+    driveId: driveRow?.value?.trim() || process.env.SHAREPOINT_DRIVE_ID || null,
+  };
+}
+
 export async function uploadDocument(
   organizationId: string,
   orderId: string | null,
@@ -77,8 +95,7 @@ export async function uploadDocument(
   taskId?: string | null,
   expenseActualCostId?: string | null
 ): Promise<{ driveId: string; itemId: string; webUrl?: string }> {
-  const driveId = process.env.SHAREPOINT_DRIVE_ID;
-  const siteId = process.env.SHAREPOINT_SITE_ID;
+  const { siteId, driveId } = await getSharePointSiteAndDrive();
 
   if (!driveId && !siteId) {
     throw new Error(
