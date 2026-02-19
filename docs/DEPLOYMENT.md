@@ -14,6 +14,7 @@ Vor dem ersten Deploy diese Variablen prüfen:
 **Häufige Fehler:**
 - `NEXTAUTH_URL` auf `http://localhost:3000` belassen → Login funktioniert nicht
 - `NEXTAUTH_URL` mit Trailing-Slash → Redirect-Probleme
+- **Custom Domain:** Wenn Nutzer über `https://erp.zuraio.ch` zugreifen, muss `NEXTAUTH_URL=https://erp.zuraio.ch` sein – nicht die Railway-URL (`zuraioerp-production.up.railway.app`). Sonst wird das Cookie für die falsche Domain gesetzt → doppeltes Einloggen.
 
 ## deploy-1: GitHub mit Railway verbinden
 
