@@ -55,3 +55,13 @@ Bei Railway werden Migrationen beim Build ausgeführt. Fügen Sie in `package.js
 ```
 
 Oder führen Sie Migrationen manuell aus: `railway run npx prisma migrate deploy`
+
+### Fehlgeschlagene Migration zurücksetzen
+
+Wenn eine Migration fehlschlägt (z.B. P3018), muss sie zuerst als „rolled back“ markiert werden:
+
+```bash
+railway run npx prisma migrate resolve --rolled-back 20260219210000_add_document_expense_actual_cost
+```
+
+Danach erneut deployen – die Migration wird erneut angewendet.
