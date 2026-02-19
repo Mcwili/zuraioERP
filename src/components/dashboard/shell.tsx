@@ -9,9 +9,11 @@ type UserProfile = { id: string; email: string; name: string | null; imageUrl: s
 export function DashboardShell({
   children,
   userProfile,
+  isAdmin = false,
 }: {
   children: React.ReactNode;
   userProfile: UserProfile;
+  isAdmin?: boolean;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
@@ -63,6 +65,7 @@ export function DashboardShell({
           <Sidebar
             onClose={() => setSidebarOpen(false)}
             closeOnLinkClick={isMobile}
+            isAdmin={isAdmin}
           />
         </div>
 

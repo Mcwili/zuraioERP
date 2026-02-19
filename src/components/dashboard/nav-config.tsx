@@ -8,9 +8,10 @@ import {
   BarChart3,
   Bell,
   Settings,
+  Cloud,
 } from "lucide-react";
 
-export const menuKeys: { href: string; key: string; icon: LucideIcon }[] = [
+export const menuKeys: { href: string; key: string; icon: LucideIcon; adminOnly?: boolean }[] = [
   { href: "/dashboard", key: "dashboard", icon: LayoutDashboard },
   { href: "/dashboard/contacts", key: "customers", icon: Users },
   { href: "/dashboard/orders", key: "orders", icon: FileText },
@@ -19,4 +20,5 @@ export const menuKeys: { href: string; key: string; icon: LucideIcon }[] = [
   { href: "/dashboard/reporting", key: "reporting", icon: BarChart3 },
   { href: "/dashboard/alerts", key: "alerts", icon: Bell },
   { href: "/dashboard/settings", key: "settings", icon: Settings },
+  { href: "/dashboard/settings#sharepoint", key: "sharePoint", icon: Cloud, adminOnly: true },
 ];

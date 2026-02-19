@@ -147,7 +147,7 @@ export default async function SettingsPage() {
 
         {/* SharePoint – nur für Admin */}
         {isAdmin && (
-          <section>
+          <section id="sharepoint">
             <h2 className="font-semibold text-zuraio-text mb-4">
               {tSettings("sharePoint")}
             </h2>

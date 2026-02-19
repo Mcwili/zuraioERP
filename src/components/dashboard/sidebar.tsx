@@ -10,9 +10,10 @@ interface SidebarProps {
   onClose?: () => void;
   /** Bei true wird beim Klick auf einen Menüpunkt onClose aufgerufen (z.B. für Mobile) */
   closeOnLinkClick?: boolean;
+  isAdmin?: boolean;
 }
 
-export function Sidebar({ onClose, closeOnLinkClick }: SidebarProps) {
+export function Sidebar({ onClose, closeOnLinkClick, isAdmin = false }: SidebarProps) {
   const t = useTranslations("nav");
   const pathname = usePathname();
 
@@ -71,7 +72,9 @@ export function Sidebar({ onClose, closeOnLinkClick }: SidebarProps) {
 
       {/* Navigation Items – wie alt */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden py-2 px-2">
-        {menuKeys.map((item) => {
+        {menuKeys
+          .filter((item) => !item.adminOnly || isAdmin)
+          .map((item) => {
           const isActive =
             item.href === "/dashboard"
               ? pathname === "/dashboard"

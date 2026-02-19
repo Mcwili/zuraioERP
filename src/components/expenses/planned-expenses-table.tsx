@@ -79,8 +79,8 @@ export function PlannedExpensesTable({
           cmp = a.estimatedAmount - b.estimatedAmount;
           break;
         case "plannedDate": {
-          const da = a.plannedDate instanceof Date ? a.plannedDate.toISOString() : String(a.plannedDate ?? "");
-          const db = b.plannedDate instanceof Date ? b.plannedDate.toISOString() : String(b.plannedDate ?? "");
+          const da = a.plannedDate ?? "";
+          const db = b.plannedDate ?? "";
           cmp = da.localeCompare(db);
           break;
         }

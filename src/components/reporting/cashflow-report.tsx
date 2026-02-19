@@ -74,8 +74,8 @@ export function CashflowReport({ data }: CashflowReportProps) {
                   border: "1px solid #e1dfdd",
                   borderRadius: "6px",
                 }}
-                formatter={(value: number, name: string) => [
-                  format(value),
+                formatter={(value: number | undefined, name?: string) => [
+                  format(value ?? 0),
                   name === "chartInflows" ? t("inflows") : t("outflows"),
                 ]}
                 labelFormatter={(label) => label}

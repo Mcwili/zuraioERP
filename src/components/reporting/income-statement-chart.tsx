@@ -95,9 +95,9 @@ export function IncomeStatementChart({ data }: IncomeStatementChartProps) {
                 border: "1px solid #e1dfdd",
                 borderRadius: "6px",
               }}
-              formatter={(value: number, name: string) => [
-                formatValue(value),
-                t(name as "ertrag" | "directCost" | "personnelCost" | "propertyCost" | "operatingCost"),
+              formatter={(value: number | undefined, name?: string) => [
+                formatValue(value ?? 0),
+                t((name ?? "") as "ertrag" | "directCost" | "personnelCost" | "propertyCost" | "operatingCost"),
               ]}
               labelFormatter={(label) => label}
             />
