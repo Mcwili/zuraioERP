@@ -5,11 +5,12 @@ import { useTranslations } from "next-intl";
 import { CheckSquare, Flag, Receipt, FileText, ChevronRight, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 
+/** Serialisiertes Format (date als string nach RSC-Übergabe) */
 interface AlertItem {
   id: string;
   title: string;
   description?: string;
-  date: string;
+  date: string | Date;
   orderNumber?: string;
   projectName?: string;
   link?: string;
