@@ -1,0 +1,23 @@
+{
+  "sectionImportant": "Important",
+  "noImportant": "No important pending items.",
+  "categoryTodo": "To-do",
+  "categoryMilestone": "Milestone",
+  "categoryPlannedExpense": "Planned expense",
+  "categoryBilling": "Billing",
+  "categoryInvoice": "Invoice",
+  "sectionTodos": "To-dos",
+  "sectionMilestones": "Milestones",
+  "sectionPlannedExpenses": "Planned expenses",
+  "sectionInvoices": "Invoices & billing",
+  "noTodos": "No open to-dos.",
+  "noMilestones": "No upcoming milestones.",
+  "noPlannedExpenses": "No planned expenses in the next 30 days.",
+  "noInvoices": "No overdue or upcoming invoices.",
+  "dueDate": "Due",
+  "overdue": "Overdue",
+  "order": "Order",
+  "description": "Description",
+  "open": "Open",
+  "category": "Type"
+}

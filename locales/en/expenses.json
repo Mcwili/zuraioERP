@@ -71,5 +71,16 @@
   "chartPlannedVsActual": "Expenses – Planned vs. Actual",
   "chartPlanned": "Planned",
   "chartActual": "Actual",
-  "loading": "Loading…"
+  "loading": "Loading…",
+  "seriesBilling": "Series billing",
+  "seriesBillingExpand": "Show series billing",
+  "seriesStartMonth": "Start month",
+  "seriesEndMonth": "End month",
+  "billingDay": "Billing day",
+  "monthsBilled": "Months billed",
+  "billingInterval": "Billing interval",
+  "billingIntervalEveryMonth": "Every month",
+  "billingIntervalEvery2Months": "Every 2 months",
+  "billingIntervalEvery3Months": "Every 3 months",
+  "billingIntervalEvery4Months": "Every 4 months"
 }

@@ -110,3 +110,64 @@ export async function testSharePointConnection(): Promise<{
     return { success: false, message: msg };
   }
 }
+
+export type SharePointDriveItem = {
+  id: string;
+  name: string;
+  isFolder: boolean;
+  size?: number;
+  lastModified?: string;
+  webUrl?: string;
+};
+
+export async function listSharePointItems(
+  itemId?: string | null
+): Promise<{ items: SharePointDriveItem[]; driveId: string; webUrl?: string } | null> {
+  const session = await getServerSession(authOptions);
+  if (!session || !canManageUsers(session.user.role)) {
+    throw new Error("Nicht berechtigt");
+  }
+
+  const status = await getSharePointStatus();
+  if (!status.configured) return null;
+
+  const client = getGraphClient();
+  let driveId = status.driveId;
+
+  if (!driveId && status.siteId) {
+    const site = await client.api(`/sites/${status.siteId}/drive`).get();
+    driveId = site.id;
+  }
+  if (!driveId) return null;
+
+  const endpoint = itemId
+    ? `/drives/${driveId}/items/${itemId}/children`
+    : `/drives/${driveId}/root/children`;
+
+  const response = await client.api(endpoint).top(200).get();
+  const value = response.value;
+
+  const items: SharePointDriveItem[] = (value || []).map((item: { id: string; name: string; folder?: unknown; size?: number; lastModifiedDateTime?: string; webUrl?: string }) => ({
+    id: item.id,
+    name: item.name,
+    isFolder: !!item.folder,
+    size: item.size,
+    lastModified: item.lastModifiedDateTime,
+    webUrl: item.webUrl,
+  }));
+
+  let webUrl: string | undefined;
+  if (itemId) {
+    const folderInfo = await client.api(`/drives/${driveId}/items/${itemId}`).select("webUrl").get();
+    webUrl = folderInfo?.webUrl;
+  } else {
+    const rootInfo = await client.api(`/drives/${driveId}/root`).select("webUrl").get();
+    webUrl = rootInfo?.webUrl;
+  }
+
+  return {
+    items,
+    driveId,
+    webUrl,
+  };
+}

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
-import { Calendar } from "lucide-react";
+import { Calendar, ChevronDown, ChevronRight } from "lucide-react";
 import { createPlannedExpense, updatePlannedExpense } from "@/server/actions/expenses";
 import { formatDateCHDot, parseDateCH } from "@/lib/date-format";
 import { CalendarPopover } from "@/components/ui/calendar-popover";
@@ -75,6 +75,30 @@ export function PlannedExpenseForm({
   const inputRef = useRef<HTMLInputElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
+  const [seriesExpanded, setSeriesExpanded] = useState(false);
+  const [seriesStartMonth, setSeriesStartMonth] = useState(
+    expense?.seriesStartMonth ?? ""
+  );
+  const [seriesEndMonth, setSeriesEndMonth] = useState(
+    expense?.seriesEndMonth ?? ""
+  );
+  const [billingDay, setBillingDay] = useState(
+    expense?.billingDay ? String(expense.billingDay) : ""
+  );
+  const [billingIntervalMonths, setBillingIntervalMonths] = useState(
+    expense?.billingIntervalMonths ? String(expense.billingIntervalMonths) : "1"
+  );
+
+  const interval = Math.max(1, parseInt(billingIntervalMonths, 10) || 1);
+  const totalMonths =
+    seriesStartMonth && seriesEndMonth
+      ? (() => {
+          const [sy, sm] = seriesStartMonth.split("-").map(Number);
+          const [ey, em] = seriesEndMonth.split("-").map(Number);
+          return Math.max(0, (ey - sy) * 12 + (em - sm) + 1);
+        })()
+      : 0;
+  const monthsBilled = totalMonths > 0 ? Math.ceil(totalMonths / interval) : 0;
 
   useEffect(() => setMounted(true), []);
 
@@ -112,6 +136,24 @@ export function PlannedExpenseForm({
       }
       const plannedDate = parseDateCH(plannedDateStr);
 
+      const dayNum = billingDay ? parseInt(billingDay, 10) : 0;
+      const isValidDay = dayNum >= 1 && dayNum <= 31;
+      const intervalNum = Math.max(1, Math.min(4, parseInt(billingIntervalMonths, 10) || 1));
+      const seriesData =
+        seriesStartMonth && seriesEndMonth && isValidDay
+          ? {
+              seriesStartMonth,
+              seriesEndMonth,
+              billingDay: dayNum,
+              billingIntervalMonths: intervalNum,
+            }
+          : {
+              seriesStartMonth: null,
+              seriesEndMonth: null,
+              billingDay: null,
+              billingIntervalMonths: null,
+            };
+
       if (expense) {
         await updatePlannedExpense(expense.id, {
           description,
@@ -131,6 +173,7 @@ export function PlannedExpenseForm({
           currency,
           plannedDate: plannedDate ?? undefined,
           costType: costType as import("@prisma/client").ExpenseCostType,
+          ...seriesData,
         });
       }
       onSuccess();
@@ -285,6 +328,99 @@ export function PlannedExpenseForm({
           ))}
         </select>
       </div>
+      {!expense && (
+      <div
+        className="rounded border"
+        style={{ borderColor: "#e1dfdd", backgroundColor: "#fafaf9" }}
+      >
+        <button
+          type="button"
+          onClick={() => setSeriesExpanded((e) => !e)}
+          className="w-full flex items-center gap-2 px-3 py-2 text-left text-sm text-zuraio-textMuted hover:text-zuraio-text transition-colors"
+          aria-expanded={seriesExpanded}
+        >
+          {seriesExpanded ? (
+            <ChevronDown className="h-4 w-4 shrink-0" />
+          ) : (
+            <ChevronRight className="h-4 w-4 shrink-0" />
+          )}
+          <span>{t("seriesBilling")}</span>
+          {seriesStartMonth && seriesEndMonth && monthsBilled > 0 && !seriesExpanded && (
+            <span className="text-xs ml-1">
+              ({seriesStartMonth} – {seriesEndMonth}, {monthsBilled} {t("monthsBilled")}{interval > 1 ? `, ${t(`billingIntervalEvery${interval}Months`)}` : ""})
+            </span>
+          )}
+        </button>
+        {seriesExpanded && (
+          <div className="px-3 pb-3 pt-0 space-y-3 border-t" style={{ borderColor: "#e1dfdd" }}>
+            <div className="grid grid-cols-2 gap-3 pt-3">
+              <div>
+                <label className="block text-xs font-medium text-zuraio-textMuted mb-1">
+                  {t("seriesStartMonth")}
+                </label>
+                <input
+                  type="month"
+                  value={seriesStartMonth}
+                  onChange={(e) => setSeriesStartMonth(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border rounded"
+                  style={{ borderColor: "#e1dfdd" }}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-zuraio-textMuted mb-1">
+                  {t("seriesEndMonth")}
+                </label>
+                <input
+                  type="month"
+                  value={seriesEndMonth}
+                  onChange={(e) => setSeriesEndMonth(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border rounded"
+                  style={{ borderColor: "#e1dfdd" }}
+                />
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-3 items-end">
+              <div className="w-20">
+                <label className="block text-xs font-medium text-zuraio-textMuted mb-1">
+                  {t("billingDay")}
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={31}
+                  value={billingDay}
+                  onChange={(e) => setBillingDay(e.target.value)}
+                  placeholder="1–31"
+                  className="w-full px-3 py-2 text-sm border rounded"
+                  style={{ borderColor: "#e1dfdd" }}
+                />
+              </div>
+              <div className="flex-1 min-w-[140px]">
+                <label className="block text-xs font-medium text-zuraio-textMuted mb-1">
+                  {t("billingInterval")}
+                </label>
+                <select
+                  value={billingIntervalMonths}
+                  onChange={(e) => setBillingIntervalMonths(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border rounded"
+                  style={{ borderColor: "#e1dfdd" }}
+                >
+                  <option value="1">{t("billingIntervalEveryMonth")}</option>
+                  <option value="2">{t("billingIntervalEvery2Months")}</option>
+                  <option value="3">{t("billingIntervalEvery3Months")}</option>
+                  <option value="4">{t("billingIntervalEvery4Months")}</option>
+                </select>
+              </div>
+              {monthsBilled > 0 && (
+                <span className="text-xs text-zuraio-textMuted pb-2">
+                  {t("monthsBilled")}: {monthsBilled}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+      )}
       <div className="flex gap-2 pt-2">
         <button
           type="submit"
@@ -305,10 +441,6 @@ export function PlannedExpenseForm({
     </form>
   );
 
-  if (expense) {
-    return <div className="p-4">{formContent}</div>;
-  }
-
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -319,7 +451,9 @@ export function PlannedExpenseForm({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-4 border-b" style={{ borderColor: "#e1dfdd" }}>
-          <h3 className="text-lg font-semibold text-zuraio-text">{t("addPlannedExpense")}</h3>
+          <h3 className="text-lg font-semibold text-zuraio-text">
+            {expense ? t("editPlannedExpense") : t("addPlannedExpense")}
+          </h3>
         </div>
         <div className="p-6">{formContent}</div>
       </div>

@@ -71,5 +71,16 @@
   "chartPlannedVsActual": "Despesas – Planejado vs. Efetivo",
   "chartPlanned": "Planejado",
   "chartActual": "Efetivo",
-  "loading": "Carregando…"
+  "loading": "Carregando…",
+  "seriesBilling": "Faturamento em série",
+  "seriesBillingExpand": "Mostrar faturamento em série",
+  "seriesStartMonth": "Mês inicial",
+  "seriesEndMonth": "Mês final",
+  "billingDay": "Dia de faturamento",
+  "monthsBilled": "Meses faturados",
+  "billingInterval": "Intervalo de faturamento",
+  "billingIntervalEveryMonth": "Todo mês",
+  "billingIntervalEvery2Months": "A cada 2 meses",
+  "billingIntervalEvery3Months": "A cada 3 meses",
+  "billingIntervalEvery4Months": "A cada 4 meses"
 }

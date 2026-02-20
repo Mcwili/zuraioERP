@@ -466,17 +466,17 @@ model BudgetActualCost {
 // --- Ausgaben (geplant + effektiv) ---
 
 model PlannedExpense {
-  id              String              @id @default(cuid())
-  organizationId  String?             @map("organization_id")
-  orderId         String?             @map("order_id")
-  description     String              @db.Text
-  estimatedAmount Decimal             @map("estimated_amount") @db.Decimal(12, 2)
-  currency        String              @default("CHF")
-  plannedDate     DateTime?           @map("planned_date")
-  costType        ExpenseCostType     @map("cost_type")
-  status          PlannedExpenseStatus @default(PLANNED)
-  createdAt       DateTime            @default(now()) @map("created_at")
-  updatedAt       DateTime            @updatedAt @map("updated_at")
+  id               String              @id @default(cuid())
+  organizationId   String?             @map("organization_id")
+  orderId          String?             @map("order_id")
+  description      String              @db.Text
+  estimatedAmount  Decimal             @map("estimated_amount") @db.Decimal(12, 2)
+  currency         String              @default("CHF")
+  plannedDate      DateTime?           @map("planned_date")
+  costType         ExpenseCostType     @map("cost_type")
+  status           PlannedExpenseStatus @default(PLANNED)
+  createdAt        DateTime            @default(now()) @map("created_at")
+  updatedAt        DateTime            @updatedAt @map("updated_at")
 
   organization    Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   order           Order?      @relation(fields: [orderId], references: [id], onDelete: SetNull)

@@ -28,7 +28,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<SortKey>("orderNumber");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  const [showGantt, setShowGantt] = useState(false);
+  const [showGantt, setShowGantt] = useState(true);
 
   const filtered = orders.filter((o) => {
     const q = search.toLowerCase().trim();

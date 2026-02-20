@@ -1,0 +1,23 @@
+{
+  "sectionImportant": "Wichtig",
+  "noImportant": "Keine wichtigen Pendenzen.",
+  "categoryTodo": "To-do",
+  "categoryMilestone": "Meilenstein",
+  "categoryPlannedExpense": "Geplante Ausgabe",
+  "categoryBilling": "Abrechnung",
+  "categoryInvoice": "Rechnung",
+  "sectionTodos": "To-dos",
+  "sectionMilestones": "Meilensteine",
+  "sectionPlannedExpenses": "Geplante Ausgaben",
+  "sectionInvoices": "Rechnungen & Abrechnungen",
+  "noTodos": "Keine offenen To-dos.",
+  "noMilestones": "Keine anstehenden Meilensteine.",
+  "noPlannedExpenses": "Keine geplanten Ausgaben in den nächsten 30 Tagen.",
+  "noInvoices": "Keine überfälligen oder anstehenden Rechnungen.",
+  "dueDate": "Fällig",
+  "overdue": "Überfällig",
+  "order": "Auftrag",
+  "description": "Beschreibung",
+  "open": "Öffnen",
+  "category": "Art"
+}

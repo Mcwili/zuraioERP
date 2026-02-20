@@ -10,6 +10,31 @@ import type { ExpenseCostType, PlannedExpenseStatus } from "@prisma/client";
 
 // --- Geplante Ausgaben ---
 
+/** Berechnet die Verrechnungsdaten für eine Serienplanung. */
+function getSeriesBillingDates(
+  seriesStartMonth: string,
+  seriesEndMonth: string,
+  billingDay: number,
+  intervalMonths: number
+): Date[] {
+  const [startYear, startMonth] = seriesStartMonth.split("-").map(Number);
+  const [endYear, endMonth] = seriesEndMonth.split("-").map(Number);
+  const dates: Date[] = [];
+  let y = startYear;
+  let m = startMonth;
+  const endMonthIdx = endYear * 12 + endMonth;
+  while (y * 12 + m <= endMonthIdx) {
+    const day = Math.min(billingDay, new Date(y, m, 0).getDate());
+    dates.push(new Date(y, m - 1, day));
+    m += intervalMonths;
+    while (m > 12) {
+      m -= 12;
+      y += 1;
+    }
+  }
+  return dates;
+}
+
 export async function createPlannedExpense(data: {
   organizationId?: string | null;
   orderId?: string | null;
@@ -18,10 +43,65 @@ export async function createPlannedExpense(data: {
   currency?: string;
   plannedDate?: Date | null;
   costType: ExpenseCostType;
+  seriesStartMonth?: string | null;
+  seriesEndMonth?: string | null;
+  billingDay?: number | null;
+  billingIntervalMonths?: number | null;
 }) {
   const session = await getServerSession(authOptions);
   if (!session || !canAccessExpenses(session.user.role)) {
     throw new Error("Nicht berechtigt");
+  }
+
+  const isSeries =
+    data.seriesStartMonth &&
+    data.seriesEndMonth &&
+    data.billingDay != null &&
+    data.billingDay >= 1 &&
+    data.billingDay <= 31;
+  const interval = Math.max(1, Math.min(4, data.billingIntervalMonths ?? 1));
+
+  if (isSeries) {
+    const dates = getSeriesBillingDates(
+      data.seriesStartMonth,
+      data.seriesEndMonth,
+      data.billingDay,
+      interval
+    );
+    if (dates.length === 0) {
+      throw new Error("Keine gültigen Verrechnungsdaten für die Serienplanung");
+    }
+
+    const baseData = {
+      organizationId: data.organizationId || null,
+      orderId: data.orderId ?? null,
+      description: data.description,
+      estimatedAmount: data.estimatedAmount,
+      currency: data.currency ?? "CHF",
+      costType: data.costType,
+    };
+
+    const created = await prisma.$transaction(
+      dates.map((plannedDate) =>
+        prisma.plannedExpense.create({
+          data: { ...baseData, plannedDate },
+        })
+      )
+    );
+
+    for (const expense of created) {
+      await logAudit({
+        userId: session.user?.id,
+        action: "Planned expense created (series)",
+        entityType: "PlannedExpense",
+        entityId: expense.id,
+        newValues: { ...baseData, plannedDate: expense.plannedDate },
+      });
+    }
+
+    revalidatePath("/dashboard/expenses");
+    if (data.orderId) revalidatePath(`/dashboard/orders/${data.orderId}`);
+    return created[0];
   }
 
   const expense = await prisma.plannedExpense.create({

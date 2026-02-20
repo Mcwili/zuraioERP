@@ -173,7 +173,8 @@ export function ActualCostsTable({
           </button>
         </div>
       ) : (
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[800px]">
           <thead style={{ backgroundColor: "#f8f8f7", borderBottom: "1px solid #e1dfdd" }}>
             <tr>
               <SortHeader sortKey="description">{t("description")}</SortHeader>
@@ -247,10 +248,10 @@ export function ActualCostsTable({
                       type="button"
                       onClick={() => handleDelete(c.id)}
                       disabled={deletingId === c.id}
-                      className="p-2 rounded-md transition-colors hover:bg-red-50 disabled:opacity-50"
+                      className="p-2 rounded-md transition-colors hover:bg-red-50 disabled:opacity-50 text-red-600 hover:text-red-700"
                       title={t("deleteActualCost")}
                     >
-                      <Trash2 className="h-4 w-4" style={{ color: "#605e5c" }} />
+                      <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
                 </td>
@@ -258,6 +259,7 @@ export function ActualCostsTable({
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       {uploadCostId && (

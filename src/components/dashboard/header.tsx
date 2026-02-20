@@ -14,9 +14,10 @@ interface HeaderProps {
   sidebarOpen: boolean;
   onToggleSidebar: () => void;
   userProfile: UserProfile;
+  importantAlertsCount?: number;
 }
 
-export function Header({ sidebarOpen, onToggleSidebar, userProfile }: HeaderProps) {
+export function Header({ sidebarOpen, onToggleSidebar, userProfile, importantAlertsCount = 0 }: HeaderProps) {
   const t = useTranslations("nav");
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -96,9 +97,11 @@ export function Header({ sidebarOpen, onToggleSidebar, userProfile }: HeaderProp
           }}
         >
           <Bell className="h-5 w-5" />
-          <span className="absolute top-1 right-1 h-4 w-4 bg-zuraio-loginAccent rounded-full text-xs flex items-center justify-center text-white font-medium">
-            0
-          </span>
+          {importantAlertsCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-rose-500 rounded-full text-[10px] flex items-center justify-center text-white font-medium">
+              {importantAlertsCount > 99 ? "99+" : importantAlertsCount}
+            </span>
+          )}
         </Link>
         <div className="relative" ref={menuRef}>
           <button

@@ -11,9 +11,11 @@ interface SidebarProps {
   /** Bei true wird beim Klick auf einen Menüpunkt onClose aufgerufen (z.B. für Mobile) */
   closeOnLinkClick?: boolean;
   isAdmin?: boolean;
+  /** Bei true zeigt der SharePoint-Link den Explorer, sonst die Einstellungen */
+  sharePointConfigured?: boolean;
 }
 
-export function Sidebar({ onClose, closeOnLinkClick, isAdmin = false }: SidebarProps) {
+export function Sidebar({ onClose, closeOnLinkClick, isAdmin = false, sharePointConfigured = false }: SidebarProps) {
   const t = useTranslations("nav");
   const pathname = usePathname();
 
@@ -75,14 +77,18 @@ export function Sidebar({ onClose, closeOnLinkClick, isAdmin = false }: SidebarP
         {menuKeys
           .filter((item) => !item.adminOnly || isAdmin)
           .map((item) => {
+          const href =
+            item.key === "sharePoint" && sharePointConfigured
+              ? "/dashboard/sharepoint"
+              : item.href;
           const isActive =
-            item.href === "/dashboard"
+            href === "/dashboard"
               ? pathname === "/dashboard"
-              : pathname.startsWith(item.href);
+              : pathname.startsWith(href);
           return (
             <Link
-              key={item.href}
-              href={item.href}
+              key={item.key}
+              href={href}
               className="flex items-center gap-3 px-4 py-2.5 text-sm transition-all rounded-lg block w-full"
               style={{
                 backgroundColor: isActive ? "#DCE6B5" : "transparent",

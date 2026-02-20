@@ -67,5 +67,20 @@
   "noOrder": "Kein Auftrag",
   "fileHint": "PDF, DOC, DOCX, XLS, XLSX, TXT, CSV, JPG, PNG, GIF, WEBP (max. 10 MB)",
   "upload": "Hochladen",
-  "uploadFailed": "Upload fehlgeschlagen"
+  "uploadFailed": "Upload fehlgeschlagen",
+  "chartPlannedVsActual": "Ausgaben – Geplant vs. Effektiv",
+  "chartPlanned": "Geplant",
+  "chartActual": "Effektiv",
+  "loading": "Laden…",
+  "seriesBilling": "Serienverrechnung",
+  "seriesBillingExpand": "Serienverrechnung einblenden",
+  "seriesStartMonth": "Anfangsmonat",
+  "seriesEndMonth": "Endmonat",
+  "billingDay": "Verrechnungstag",
+  "monthsBilled": "Verrechnete Monate",
+  "billingInterval": "Verrechnungsintervall",
+  "billingIntervalEveryMonth": "Jeden Monat",
+  "billingIntervalEvery2Months": "Alle 2 Monate",
+  "billingIntervalEvery3Months": "Alle 3 Monate",
+  "billingIntervalEvery4Months": "Alle 4 Monate"
 }

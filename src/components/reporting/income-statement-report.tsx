@@ -23,6 +23,9 @@ const PERSONNEL_ORDER: { costTypes: string[]; labelKey: string }[] = [
   { costTypes: ["SONSTIGES"], labelKey: "costTypeSonstiges" },
 ];
 
+/** Unterpositionen für Property Cost (Platzhalter für künftige Aufschlüsselung) */
+const PROPERTY_ORDER: { costTypes: string[]; labelKey: string }[] = [];
+
 /** Reihenfolge Betriebsaufwand wie im Referenzbild */
 const OPERATING_ORDER: { costTypes: string[]; labelKey: string }[] = [
   { costTypes: ["BUCHFUEHRUNG"], labelKey: "costTypeBuchfuehrungBeratungAudit" },
@@ -45,6 +48,7 @@ type RowType =
   | { type: "personnelCost" }
   | { type: "personnelCostSub"; costTypes: string[]; labelKey: string }
   | { type: "propertyCost" }
+  | { type: "propertyCostSub"; costTypes: string[]; labelKey: string }
   | { type: "operatingCost" }
   | { type: "operatingCostSub"; costTypes: string[]; labelKey: string }
   | { type: "ebitda" }
@@ -84,6 +88,8 @@ function getMonthValue(
         : 0;
     case "propertyCost":
       return actual ? month.propertyCost : month.budgetPropertyCost;
+    case "propertyCostSub":
+      return 0;
     case "operatingCost":
       return actual ? month.operatingCost : month.budgetOperatingCost;
     case "operatingCostSub":
@@ -126,6 +132,11 @@ function buildRows(months: IncomeStatementMonthData[]): RowType[] {
       labelKey,
     })),
     { type: "propertyCost" },
+    ...PROPERTY_ORDER.map(({ costTypes, labelKey }) => ({
+      type: "propertyCostSub" as const,
+      costTypes,
+      labelKey,
+    })),
     { type: "operatingCost" },
     ...OPERATING_ORDER.map(({ costTypes, labelKey }) => ({
       type: "operatingCostSub" as const,
@@ -143,14 +154,19 @@ function buildRows(months: IncomeStatementMonthData[]): RowType[] {
 export function IncomeStatementReport({ data }: IncomeStatementReportProps) {
   const t = useTranslations("reporting");
   const tExpenses = useTranslations("expenses");
+  const [directCostCollapsed, setDirectCostCollapsed] = useState(true);
   const [personnelCollapsed, setPersonnelCollapsed] = useState(true);
   const [operatingCollapsed, setOperatingCollapsed] = useState(true);
   const format = (v: number) =>
     v.toLocaleString("de-CH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const allRows = buildRows(data.months);
+  const [propertyCostCollapsed, setPropertyCostCollapsed] = useState(true);
+
   const rows = allRows.filter((row) => {
+    if (row.type === "directCostSub" && directCostCollapsed) return false;
     if (row.type === "personnelCostSub" && personnelCollapsed) return false;
+    if (row.type === "propertyCostSub" && propertyCostCollapsed) return false;
     if (row.type === "operatingCostSub" && operatingCollapsed) return false;
     return true;
   });
@@ -192,6 +208,8 @@ export function IncomeStatementReport({ data }: IncomeStatementReportProps) {
         return `  ${tExpenses(row.labelKey)}`;
       case "propertyCost":
         return t("propertyCost");
+      case "propertyCostSub":
+        return `  ${tExpenses(row.labelKey)}`;
       case "operatingCost":
         return t("operatingCost");
       case "operatingCostSub":
@@ -210,6 +228,7 @@ export function IncomeStatementReport({ data }: IncomeStatementReportProps) {
   const isSubRow = (row: RowType) =>
     row.type === "directCostSub" ||
     row.type === "personnelCostSub" ||
+    row.type === "propertyCostSub" ||
     row.type === "operatingCostSub";
   const isBold = (row: RowType) =>
     row.type === "grossProfit" ||
@@ -224,6 +243,7 @@ export function IncomeStatementReport({ data }: IncomeStatementReportProps) {
     row.type === "personnelCost" ||
     row.type === "personnelCostSub" ||
     row.type === "propertyCost" ||
+    row.type === "propertyCostSub" ||
     row.type === "operatingCost" ||
     row.type === "operatingCostSub";
 
@@ -320,6 +340,20 @@ export function IncomeStatementReport({ data }: IncomeStatementReportProps) {
                 style={{ color: "#1c1c1c" }}
               >
                 <span className="inline-flex items-center gap-1">
+                  {row.type === "directCost" && (
+                    <button
+                      type="button"
+                      onClick={() => setDirectCostCollapsed((c) => !c)}
+                      className="p-0.5 rounded hover:bg-[#e8e8e6] transition-colors"
+                      aria-label={directCostCollapsed ? t("expand") : t("collapse")}
+                    >
+                      {directCostCollapsed ? (
+                        <ChevronRight className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4" />
+                      )}
+                    </button>
+                  )}
                   {row.type === "personnelCost" && (
                     <button
                       type="button"
@@ -328,6 +362,20 @@ export function IncomeStatementReport({ data }: IncomeStatementReportProps) {
                       aria-label={personnelCollapsed ? t("expand") : t("collapse")}
                     >
                       {personnelCollapsed ? (
+                        <ChevronRight className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4" />
+                      )}
+                    </button>
+                  )}
+                  {row.type === "propertyCost" && (
+                    <button
+                      type="button"
+                      onClick={() => setPropertyCostCollapsed((c) => !c)}
+                      className="p-0.5 rounded hover:bg-[#e8e8e6] transition-colors"
+                      aria-label={propertyCostCollapsed ? t("expand") : t("collapse")}
+                    >
+                      {propertyCostCollapsed ? (
                         <ChevronRight className="h-4 w-4" />
                       ) : (
                         <ChevronDown className="h-4 w-4" />

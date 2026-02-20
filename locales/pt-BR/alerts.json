@@ -1,0 +1,23 @@
+{
+  "sectionImportant": "Importante",
+  "noImportant": "Nenhum item pendente importante.",
+  "categoryTodo": "To-do",
+  "categoryMilestone": "Marco",
+  "categoryPlannedExpense": "Despesa planejada",
+  "categoryBilling": "Faturamento",
+  "categoryInvoice": "Fatura",
+  "sectionTodos": "To-dos",
+  "sectionMilestones": "Marcos",
+  "sectionPlannedExpenses": "Despesas planejadas",
+  "sectionInvoices": "Faturas e cobranças",
+  "noTodos": "Nenhum to-do aberto.",
+  "noMilestones": "Nenhum marco próximo.",
+  "noPlannedExpenses": "Nenhuma despesa planejada nos próximos 30 dias.",
+  "noInvoices": "Nenhuma fatura vencida ou próxima.",
+  "dueDate": "Vencimento",
+  "overdue": "Vencido",
+  "order": "Pedido",
+  "description": "Descrição",
+  "open": "Abrir",
+  "category": "Tipo"
+}

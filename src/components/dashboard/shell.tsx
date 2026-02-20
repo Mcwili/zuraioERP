@@ -10,10 +10,14 @@ export function DashboardShell({
   children,
   userProfile,
   isAdmin = false,
+  importantAlertsCount = 0,
+  sharePointConfigured = false,
 }: {
   children: React.ReactNode;
   userProfile: UserProfile;
   isAdmin?: boolean;
+  importantAlertsCount?: number;
+  sharePointConfigured?: boolean;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
@@ -39,6 +43,7 @@ export function DashboardShell({
         sidebarOpen={sidebarOpen}
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
         userProfile={userProfile}
+        importantAlertsCount={importantAlertsCount}
       />
 
       <div className="flex-1 flex overflow-hidden relative">
@@ -66,6 +71,7 @@ export function DashboardShell({
             onClose={() => setSidebarOpen(false)}
             closeOnLinkClick={isMobile}
             isAdmin={isAdmin}
+            sharePointConfigured={sharePointConfigured}
           />
         </div>
 

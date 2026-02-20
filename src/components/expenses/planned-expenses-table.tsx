@@ -171,7 +171,8 @@ export function PlannedExpensesTable({
           </button>
         </div>
       ) : (
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[700px]">
           <thead style={{ backgroundColor: "#f8f8f7", borderBottom: "1px solid #e1dfdd" }}>
             <tr>
               <SortHeader sortKey="description">{t("description")}</SortHeader>
@@ -182,7 +183,7 @@ export function PlannedExpensesTable({
               <SortHeader sortKey="costType">{t("costType")}</SortHeader>
               <SortHeader sortKey="order">{t("order")}</SortHeader>
               <SortHeader sortKey="status">{t("status")}</SortHeader>
-              <th className="w-20 px-3 py-2"></th>
+              <th className="w-24 px-3 py-2"></th>
             </tr>
           </thead>
           <tbody>
@@ -244,10 +245,10 @@ export function PlannedExpensesTable({
                           type="button"
                           onClick={() => handleDelete(e.id)}
                           disabled={deletingId === e.id}
-                          className="p-2 rounded-md transition-colors hover:bg-red-50 disabled:opacity-50"
+                          className="p-2 rounded-md transition-colors hover:bg-red-50 disabled:opacity-50 text-red-600 hover:text-red-700"
                           title={t("deletePlannedExpense")}
                         >
-                          <Trash2 className="h-4 w-4" style={{ color: "#605e5c" }} />
+                          <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
                     </td>
@@ -257,6 +258,7 @@ export function PlannedExpensesTable({
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </>
   );
